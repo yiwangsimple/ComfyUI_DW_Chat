@@ -8,7 +8,7 @@ The following four models are currently supported.
 * mixtral-8x7b-32768
 * llama3-8b-8192
 
-The API was requested through https://console.groq.com/keys, which had not launched a paid plan as of the time of publication. 
+The API was requested through https://console.groq.com/keys, which had not launched a paid plan as of the time of publication. Fill the api key into the "config.json" file.
 However, there are corresponding restrictions, as shown below:
 ![](limits.png)
 ____
