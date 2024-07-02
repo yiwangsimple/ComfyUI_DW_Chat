@@ -1,4 +1,4 @@
-# comfy-graqchat
+# comfy-groqchat
 Content generation with open source models in comfyui via graq api implementation.
 
 # Usage:
