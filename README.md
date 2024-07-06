@@ -4,7 +4,8 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 # Usage:
 PaliGemmaPixelProse image backpropagation node.
 ![](demo01.png)
-The following four models are currently supported.
+
+Groq nodes are based on the groq cloud API.The following four models are currently supported.
 * gemma-7b-it
 * llama3-70b-8192
 * mixtral-8x7b-32768
