@@ -19,7 +19,7 @@ class PaliGemmaPixelProse:
         return {
             "required": {
                 "image": ("IMAGE",),
-                "prompt": ("STRING", {"multiline": False, "default": "caption en"}),
+                "prompt": ("STRING", {"multiline": False, "default": "Describe in detail what's in this image."}),
             },
         }
 
