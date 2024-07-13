@@ -2,8 +2,14 @@
 Updated image backpropagation nodes based on Google's open-source PaliGemma vision model. The model used in the node is a fine-tuned version of gokayfem's big brother, special thanks for that! Content generation with open source models in comfyui via graq api implementation.
 
 # Usage:
+新更新了对 kimi api的支持，包括“Moonshot Single Chat”和“Moonshot Multi Chat”两个节点，分别支持单轮或多轮对话。API申请地址 https://platform.moonshot.cn/console/info
+单轮对话，如下所示：
+![](image/single.png)
+多轮对话：
+![](image/multi.png)
+
 PaliGemmaPixelProse image backpropagation node.
-![](demo01.png)
+![](image/demo01.png)
 
 Groq nodes are based on the groq cloud API.The following four models are currently supported.
 * gemma-7b-it
@@ -13,12 +19,12 @@ Groq nodes are based on the groq cloud API.The following four models are current
 
 The API was requested through https://console.groq.com/keys, which had not launched a paid plan as of the time of publication. Fill the api key into the "config.json" file.
 However, there are corresponding restrictions, as shown below:
-![](limits.png)
+![](image/limits.png)
 ____
 ## Example:
-![](workflow.png)
+![](image/workflow.png)
 The use of nodes enables the generation of positive and negative cues in 2 seconds through specific cues.
-![](prompt_workflow.png)
+![](image/prompt_workflow.png)
 Picture with workflow
 ____
 ##Statement：
