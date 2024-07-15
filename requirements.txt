@@ -3,3 +3,5 @@ torch
 Pillow
 huggingface_hub
 groq
+openai>=1.0
+httpx
