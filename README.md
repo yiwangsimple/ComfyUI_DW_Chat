@@ -3,7 +3,7 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 # Usage:
 2024-07-14
-新增了SD3LongCaptionerV2节点更新了SD3LongCaptioner.py和PaliGemmaPixelProse.py这两个图像反推节点的模型加载和存储目录，考虑到模型偏大的问题，可以手动从huggingface上下载模型放到ComfyUl/models/LLavacheckpoints/files_for_sd3_long_captioner这个目录下，模型地址https://huggingface.co/gokaygokay/sd3-long-captioner（PaliGemmaPixelProse.py等其他节点同理）
+新增了SD3LongCaptionerV2这个图像反推节点的模型加载和存储目录，考虑到模型偏大的问题，可以手动从huggingface上下载模型放到ComfyUl/models/LLavacheckpoints/files_for_sd3_long_captioner_v2这个目录下，模型地址https://huggingface.co/gokaygokay/sd3-long-captioner-v2
 再次更新了基于kimi API的文件对话功能的file_based_chat节点，能实现低配的知识库功能，上传文件格式支持pdf、doc、xlsx、ppt、txt、图片等。具体应用示例，可以上传知识库中的”常见报错问题(文档可在库中获得，来源K佬)”，来解决部分报错问题
 ![](image/demo02.png)
 新更新了对 kimi api的支持，包括“Moonshot Single Chat”和“Moonshot Multi Chat”两个节点，分别支持单轮或多轮对话。API申请地址 https://platform.moonshot.cn/console/info
@@ -11,9 +11,6 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 ![](image/single.png)
 多轮对话：
 ![](image/multi.png)
-
-PaliGemmaPixelProse image backpropagation node.
-![](image/demo01.png)
 
 Groq nodes are based on the groq cloud API.The following four models are currently supported.
 * gemma-7b-it
