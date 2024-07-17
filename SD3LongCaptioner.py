@@ -1,18 +1,32 @@
 import os
-import io
 from pathlib import Path
 import torch
 from PIL import Image
 from torchvision.transforms import ToPILImage
 from transformers import AutoProcessor, AutoModelForCausalLM
 import folder_paths
+from huggingface_hub import snapshot_download
+
+# 定义模型文件存储目录
+files_for_sd3_long_captioner = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner"))
+files_for_sd3_long_captioner.mkdir(parents=True, exist_ok=True)
 
 class SD3LongCaptioner:
     def __init__(self):
         self.model_id = "gokaygokay/sd3-long-captioner"
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_id).to(self.device).eval()
-        self.processor = AutoProcessor.from_pretrained(self.model_id)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model = None
+        self.processor = None
+
+    def load_model(self):
+        if self.model is None or self.processor is None:
+            self.model_path = snapshot_download(self.model_id, 
+                                                local_dir=files_for_sd3_long_captioner,
+                                                force_download=False,
+                                                local_files_only=False,
+                                                local_dir_use_symlinks="auto")
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path).to(self.device).eval()
+            self.processor = AutoProcessor.from_pretrained(self.model_path)
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -29,13 +43,15 @@ class SD3LongCaptioner:
     CATEGORY = "image/text"
 
     def generate_caption(self, image, prompt):
-        # Convert the image tensor to PIL Image
+        self.load_model()  # 确保模型已加载
+        
+        # 将图像张量转换为PIL图像
         pil_image = ToPILImage()(image[0].permute(2, 0, 1))
         
-        # Process the image and prompt
+        # 处理图像和提示
         model_inputs = self.processor(text=prompt, images=pil_image, return_tensors="pt").to(self.device)
         
-        # Generate caption
+        # 生成描述
         with torch.inference_mode():
             input_len = model_inputs["input_ids"].shape[-1]
             generation = self.model.generate(
@@ -45,7 +61,7 @@ class SD3LongCaptioner:
                 do_sample=False
             )
         
-        # Decode the generated text
+        # 解码生成的文本
         generation = generation[0][input_len:]
         decoded = self.processor.decode(generation, skip_special_tokens=True)
         
