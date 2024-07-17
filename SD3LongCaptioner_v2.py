@@ -9,7 +9,9 @@ from huggingface_hub import snapshot_download
 
 # 定义模型文件存储目录
 files_for_sd3_long_captioner_v2 = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner_v2"))
-files_for_sd3_long_captioner_v2.mkdir(parents=true, exist_ok=True)
+files_for_sd3_long_captioner_v2.mkdir(parents=True, exist_ok=True)
+
+# ... 其余代码 ...
 
 class SD3LongCaptionerV2:
     def __init__(self):
