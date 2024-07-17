@@ -6,6 +6,7 @@ from torchvision.transforms import ToPILImage
 from transformers import AutoProcessor, AutoModelForVision2Seq
 import folder_paths
 from huggingface_hub import snapshot_download
+import gc
 
 # 定义模型文件存储目录
 files_for_sd3_long_captioner_v2 = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner_v2"))
@@ -27,6 +28,18 @@ class SD3LongCaptionerV2:
                                                 local_dir_use_symlinks="auto")
             self.model = AutoModelForVision2Seq.from_pretrained(self.model_path).to(self.device).eval()
             self.processor = AutoProcessor.from_pretrained(self.model_path)
+
+    def clear_memory(self):
+        # 清理内存
+        if self.model is not None:
+            del self.model
+            self.model = None
+        if self.processor is not None:
+            del self.processor
+            self.processor = None
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -65,6 +78,9 @@ class SD3LongCaptionerV2:
         
         # 移除开头的提示词（如果存在）
         decoded = decoded.replace(prompt, "", 1).strip()
+        
+        # 清理内存
+        self.clear_memory()
         
         return (decoded,)
 
