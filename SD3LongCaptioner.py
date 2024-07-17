@@ -3,7 +3,7 @@ from pathlib import Path
 import torch
 from PIL import Image
 from torchvision.transforms import ToPILImage
-from transformers import AutoProcessor, AutoModelForCausalLM
+from transformers import AutoProcessor, AutoModelForVision2Seq
 import folder_paths
 from huggingface_hub import snapshot_download
 
@@ -25,7 +25,7 @@ class SD3LongCaptioner:
                                                 force_download=False,
                                                 local_files_only=False,
                                                 local_dir_use_symlinks="auto")
-            self.model = AutoModelForCausalLM.from_pretrained(self.model_path).to(self.device).eval()
+            self.model = AutoModelForVision2Seq.from_pretrained(self.model_path).to(self.device).eval()
             self.processor = AutoProcessor.from_pretrained(self.model_path)
 
     @classmethod
@@ -53,7 +53,6 @@ class SD3LongCaptioner:
         
         # 生成描述
         with torch.inference_mode():
-            input_len = model_inputs["input_ids"].shape[-1]
             generation = self.model.generate(
                 **model_inputs,
                 repetition_penalty=1.05,
@@ -62,8 +61,7 @@ class SD3LongCaptioner:
             )
         
         # 解码生成的文本
-        generation = generation[0][input_len:]
-        decoded = self.processor.decode(generation, skip_special_tokens=True)
+        decoded = self.processor.decode(generation[0], skip_special_tokens=True)
         
         return (decoded,)
 
