@@ -3,17 +3,17 @@ from pathlib import Path
 import torch
 from PIL import Image
 from torchvision.transforms import ToPILImage
-from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
+from transformers import AutoProcessor, AutoModelForCausalLM
 import folder_paths
 from huggingface_hub import snapshot_download
 
 # 定义模型文件存储目录
-files_for_paligemma_pixelprose = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_paligemma_pixelprose"))
-files_for_paligemma_pixelprose.mkdir(parents=True, exist_ok=True)
+files_for_sd3_long_captioner = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner_v2"))
+files_for_sd3_long_captioner.mkdir(parents=True, exist_ok=True)
 
-class PaliGemmaPixelProse:
+class SD3LongCaptionerV2:
     def __init__(self):
-        self.model_id = "gokaygokay/PaliGemma-PixelProse"
+        self.model_id = "gokaygokay/sd3-long-captioner-v2"
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = None
         self.processor = None
@@ -21,11 +21,11 @@ class PaliGemmaPixelProse:
     def load_model(self):
         if self.model is None or self.processor is None:
             self.model_path = snapshot_download(self.model_id, 
-                                                local_dir=files_for_paligemma_pixelprose,
+                                                local_dir=files_for_sd3_long_captioner,
                                                 force_download=False,
                                                 local_files_only=False,
                                                 local_dir_use_symlinks="auto")
-            self.model = PaliGemmaForConditionalGeneration.from_pretrained(self.model_path).to(self.device).eval()
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path).to(self.device).eval()
             self.processor = AutoProcessor.from_pretrained(self.model_path)
 
     @classmethod
@@ -68,9 +68,9 @@ class PaliGemmaPixelProse:
         return (decoded,)
 
 NODE_CLASS_MAPPINGS = {
-    "PaliGemmaPixelProse": PaliGemmaPixelProse
+    "SD3LongCaptionerV2": SD3LongCaptionerV2
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "PaliGemmaPixelProse": "PaliGemma PixelProse Caption"
+    "SD3LongCaptionerV2": "SD3 Long Captioner V2"
 }
