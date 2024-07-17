@@ -63,6 +63,9 @@ class SD3LongCaptioner:
         # 解码生成的文本
         decoded = self.processor.decode(generation[0], skip_special_tokens=True)
         
+        # 移除开头的提示词（如果存在）
+        decoded = decoded.replace(prompt, "", 1).strip()
+        
         return (decoded,)
 
 NODE_CLASS_MAPPINGS = {

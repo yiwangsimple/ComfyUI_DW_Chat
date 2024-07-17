@@ -11,8 +11,6 @@ from huggingface_hub import snapshot_download
 files_for_sd3_long_captioner_v2 = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner_v2"))
 files_for_sd3_long_captioner_v2.mkdir(parents=True, exist_ok=True)
 
-# ... 其余代码 ...
-
 class SD3LongCaptionerV2:
     def __init__(self):
         self.model_id = "gokaygokay/sd3-long-captioner-v2"
@@ -64,6 +62,9 @@ class SD3LongCaptionerV2:
         
         # 解码生成的文本
         decoded = self.processor.decode(generation[0], skip_special_tokens=True)
+        
+        # 移除开头的提示词（如果存在）
+        decoded = decoded.replace(prompt, "", 1).strip()
         
         return (decoded,)
 
