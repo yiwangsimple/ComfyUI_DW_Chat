@@ -7,7 +7,6 @@ from transformers import AutoProcessor, AutoModelForVision2Seq
 import folder_paths
 from huggingface_hub import snapshot_download
 import gc
-import re
 
 # 定义模型文件存储目录
 files_for_sd3_long_captioner_v2 = Path(os.path.join(folder_paths.models_dir, "LLavacheckpoints", "files_for_sd3_long_captioner_v2"))
@@ -31,6 +30,7 @@ class SD3LongCaptionerV2:
             self.processor = AutoProcessor.from_pretrained(self.model_path)
 
     def clear_memory(self):
+        # 清理内存
         if self.model is not None:
             del self.model
             self.model = None
@@ -40,16 +40,6 @@ class SD3LongCaptionerV2:
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-
-    def remove_duplicates(self, text):
-        sentences = re.split(r'(?<=[.!?])\s+', text)
-        unique_sentences = []
-        seen = set()
-        for sentence in sentences:
-            if sentence not in seen:
-                seen.add(sentence)
-                unique_sentences.append(sentence)
-        return ' '.join(unique_sentences)
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -78,11 +68,9 @@ class SD3LongCaptionerV2:
         with torch.inference_mode():
             generation = self.model.generate(
                 **model_inputs,
-                do_sample=True,
-                temperature=0.7,
-                max_new_tokens=300,
-                repetition_penalty=1.2,
-                num_return_sequences=1
+                repetition_penalty=1.05,
+                max_new_tokens=512,
+                do_sample=False
             )
         
         # 解码生成的文本
@@ -90,9 +78,6 @@ class SD3LongCaptionerV2:
         
         # 移除开头的提示词（如果存在）
         decoded = decoded.replace(prompt, "", 1).strip()
-        
-        # 移除重复的句子
-        decoded = self.remove_duplicates(decoded)
         
         # 清理内存
         self.clear_memory()
