@@ -26,7 +26,7 @@ class GroqChatNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model": (["gemma-7b-it", "llama3-70b-8192", "mixtral-8x7b-32768", "llama3-8b-8192"],),
+                "model": (["gemma-7b-it", "llama3-70b-8192", "mixtral-8x7b-32768", "llama3-8b-8192", "llama-3.1-8b-versatile", "llama-3.1-70b-versatile", "llama-3.1-405b-reasoning"],),
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
