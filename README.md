@@ -3,6 +3,7 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 # Usage:
 2024-07-24
+基于groq API的节点，新增了llama3.1模型的支持
 优化所有节点的分类，新增moondream2的图片反推节点dwimage2.py，模型支持手动下载到./ComfyUI/models/LLavacheckpoints/files_for_moondream2目录下（所有文件放在这个文件夹下）。 模型地址：https://huggingface.co/vikhyatk/moondream2/tree/main
 
 2024-07-14
