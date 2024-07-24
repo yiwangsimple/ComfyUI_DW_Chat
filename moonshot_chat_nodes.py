@@ -63,7 +63,8 @@ class MoonshotSingleChatNode(MoonshotChatBaseNode):
 class MoonshotMultiChatNode(MoonshotChatBaseNode):
     FUNCTION = "generate_chat"
     RETURN_NAMES = ("chat_history",)
-
+    CATEGORY = "🌙DW/moonshotChat"
+    
     def __init__(self):
         super().__init__()
         self.conversation_history = []

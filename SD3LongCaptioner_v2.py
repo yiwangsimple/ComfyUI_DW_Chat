@@ -53,7 +53,7 @@ class SD3LongCaptionerV2:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("caption",)
     FUNCTION = "generate_caption"
-    CATEGORY = "image/text"
+    CATEGORY = "🌙DW/SD3LongCaptionerV2"
 
     def generate_caption(self, image, prompt):
         self.load_model()  # 确保模型已加载
