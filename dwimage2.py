@@ -1,55 +1,55 @@
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from PIL import Image
 from pathlib import Path
-import torch
-from torchvision.transforms import ToPILImage
-from huggingface_hub import snapshot_download
 import folder_paths
 import os
 import shutil
+from torchvision.transforms import ToPILImage
 
-# Define the directory for saving files related to your new model
+# 定义模型存储目录
 models_dir = Path(folder_paths.base_path) / "models"
 llava_checkpoints_dir = models_dir / "LLavacheckpoints"
 files_for_moondream2 = llava_checkpoints_dir / "files_for_moondream2"
-files_for_moondream2.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
+files_for_moondream2.mkdir(parents=True, exist_ok=True)
 
 class Moondream2Predictor:
-    def __init__(self):
-        self.model_path = snapshot_download("vikhyatk/moondream2", 
-                                            local_dir=files_for_moondream2,
-                                            force_download=False,
-                                            local_files_only=False,
-                                            revision="main",  # Use the latest version
-                                            local_dir_use_symlinks="auto",
-                                            ignore_patterns=["*.bin", "*.jpg", "*.png", "*.gguf"])
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Using device: {self.device}")
-        print("Loading model...")
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_path, trust_remote_code=True).to(self.device)
-        print("Model loaded successfully")
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Moondream2Predictor, cls).__new__(cls)
+            cls._instance.model = None
+            cls._instance.tokenizer = None
+        return cls._instance
+
+    def load_model(self):
+        if self.model is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            print(f"使用设备: {self.device}")
+            print("加载模型中...")
+            self.model = AutoModelForCausalLM.from_pretrained(files_for_moondream2, trust_remote_code=True).to(self.device)
+            self.tokenizer = AutoTokenizer.from_pretrained(files_for_moondream2)
+            print("模型加载成功")
 
     def generate_predictions(self, image_path, question):
+        self.load_model()  # 确保模型已加载
         try:
-            # Load and process the image
             image_input = Image.open(image_path).convert("RGB")
             enc_image = self.model.encode_image(image_input)
-
-            # Generate predictions
             generated_text = self.model.answer_question(enc_image, question, self.tokenizer)
-
             return generated_text
         finally:
-            # Clean up temporary files
             if os.path.exists(image_path):
                 os.remove(image_path)
 
-    def __del__(self):
-        # Clean up the model when the predictor is destroyed
-        del self.model
-        del self.tokenizer
-        torch.cuda.empty_cache()  # Clear CUDA cache if using GPU
+    def clear_memory(self):
+        if self.model:
+            del self.model
+            del self.tokenizer
+            self.model = None
+            self.tokenizer = None
+            torch.cuda.empty_cache()
 
 class Moondream2model:
     def __init__(self):
@@ -60,42 +60,26 @@ class Moondream2model:
         return {
             "required": {
                 "image": ("IMAGE",),
-                "text_input": (
-                    "STRING",
-                    {
-                        "multiline": True,
-                        "default": "",
-                    },
-                ),
+                "text_input": ("STRING", {"multiline": True, "default": ""}),
             },
         }
 
     RETURN_TYPES = ("STRING",)
-
     FUNCTION = "moondream2_generate_predictions"
-
     CATEGORY = "🌙DW/dwimage2"
 
     def moondream2_generate_predictions(self, image, text_input):
-        # Convert tensor image to PIL Image
         pil_image = ToPILImage()(image[0].permute(2, 0, 1))
         temp_path = files_for_moondream2 / "temp_image.png"
-        pil_image.save(temp_path)      
+        pil_image.save(temp_path)
         
         response = self.predictor.generate_predictions(temp_path, text_input)
+        response = ' '.join(response.strip().split())
         
-        # Post-processing and optimization of the response
-        response = response.strip()  # Remove leading/trailing whitespace
-        response = ' '.join(response.split())  # Remove extra spaces
-        
-        return (response, )
+        return (response,)
 
     def __del__(self):
-        # Clean up when the node is destroyed
-        del self.predictor
-        # Clear the temporary directory
-        if files_for_moondream2.exists():
-            shutil.rmtree(files_for_moondream2)
+        self.predictor.clear_memory()
 
 NODE_CLASS_MAPPINGS = {
     "dwimage2": Moondream2model
