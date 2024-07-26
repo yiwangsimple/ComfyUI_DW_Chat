@@ -5,6 +5,7 @@ from pathlib import Path
 import folder_paths
 import os
 import shutil
+import re
 from torchvision.transforms import ToPILImage
 
 # 定义模型存储目录
@@ -50,6 +51,7 @@ class Moondream2Predictor:
             self.model = None
             self.tokenizer = None
             torch.cuda.empty_cache()
+        print("模型已卸载，内存已清理")
 
 class Moondream2model:
     def __init__(self):
@@ -69,17 +71,21 @@ class Moondream2model:
     CATEGORY = "🌙DW/dwimage2"
 
     def moondream2_generate_predictions(self, image, text_input):
-        pil_image = ToPILImage()(image[0].permute(2, 0, 1))
-        temp_path = files_for_moondream2 / "temp_image.png"
-        pil_image.save(temp_path)
-        
-        response = self.predictor.generate_predictions(temp_path, text_input)
-        response = ' '.join(response.strip().split())
-        
-        return (response,)
-
-    def __del__(self):
-        self.predictor.clear_memory()
+        try:
+            pil_image = ToPILImage()(image[0].permute(2, 0, 1))
+            temp_path = files_for_moondream2 / "temp_image.png"
+            pil_image.save(temp_path)
+            
+            response = self.predictor.generate_predictions(temp_path, text_input)
+            response = ' '.join(response.strip().split())
+           
+            # 使用正则表达式移除开头的特定短语
+            response = re.sub(r'^(The image contains|The image contains|This picture contains|This picture contains|The image contains|The image contains|This image contains|This image contains)\s*', '', response, flags=re.IGNORECASE)
+            
+            return (response,)
+        finally:
+            # 确保在函数结束时卸载模型
+            self.predictor.clear_memory()
 
 NODE_CLASS_MAPPINGS = {
     "dwimage2": Moondream2model
