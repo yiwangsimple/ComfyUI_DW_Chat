@@ -6,6 +6,7 @@ class GroqChatNode:
     def __init__(self):
         self.client = None
         self.load_api_key()
+        self.conversation_history = []
 
     def load_api_key(self):
         config_path = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -26,7 +27,7 @@ class GroqChatNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model": (["gemma-7b-it", "llama3-70b-8192", "mixtral-8x7b-32768", "llama3-8b-8192", "llama-3.1-8b-versatile", "llama-3.1-70b-versatile"],),
+                "model": (["gemma-7b-it", "gemma2-9b-it", "mixtral-8x7b-32768", "llama3-8b-8192", "llama3-70b-8192","llama3-groq-8b-8192-tool-use-preview","llama3-groq-70b-8192-tool-use-preview", "llama-3.1-8b-instant", "llama-3.1-70b-versatile"],),
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
@@ -36,33 +37,39 @@ class GroqChatNode:
                 "system_message": ("STRING", {"multiline": True}),
                 "presence_penalty": ("FLOAT", {"default": 0, "min": -2, "max": 2, "step": 0.1}),
                 "frequency_penalty": ("FLOAT", {"default": 0, "min": -2, "max": 2, "step": 0.1}),
+                "reset_conversation": ("BOOLEAN", {"default": False}),
             }
         }
 
     RETURN_TYPES = ("STRING",)
-    FUNCTION = "generate_text"
+    FUNCTION = "generate_chat"
     CATEGORY = "🌙DW/groqchat"
 
-    def generate_text(self, model, prompt, max_tokens, temperature, top_p, system_message="", presence_penalty=0, frequency_penalty=0):
+    def generate_chat(self, model, prompt, max_tokens, temperature, top_p, system_message="", presence_penalty=0, frequency_penalty=0, reset_conversation=False):
         if not self.client:
             return ("Error: GROQ_API_KEY not set or invalid. Please check your config.json file.",)
 
-        messages = []
-        if system_message:
-            messages.append({"role": "system", "content": system_message})
-        messages.append({"role": "user", "content": prompt})
+        if reset_conversation:
+            self.conversation_history = []
+
+        if not self.conversation_history and system_message:
+            self.conversation_history.append({"role": "system", "content": system_message})
+
+        self.conversation_history.append({"role": "user", "content": prompt})
 
         try:
             chat_completion = self.client.chat.completions.create(
                 model=model,
-                messages=messages,
+                messages=self.conversation_history,
                 max_tokens=max_tokens,
                 temperature=temperature,
                 top_p=top_p,
                 presence_penalty=presence_penalty,
                 frequency_penalty=frequency_penalty
             )
-            return (chat_completion.choices[0].message.content,)
+            response = chat_completion.choices[0].message.content
+            self.conversation_history.append({"role": "assistant", "content": response})
+            return (response,)  # 只返回最新的回复
         except Exception as e:
             return (f"Error: {str(e)}",)
 
