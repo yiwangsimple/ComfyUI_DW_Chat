@@ -3,8 +3,44 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 # Usage:
 2024-07-27  
-在groqchat节点中新增了reset conversation参数，值为True时，即可开启多轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。
-![](image/demo03.png)
+在groqchat节点中新增了reset conversation参数，值为True时，即可开启多轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。  此外再解释下presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两个参数的作用：  
+非常好的问题。`presence_penalty` 和 `frequency_penalty` 是用于控制语言模型输出多样性和重复性的参数。让我详细解释一下它们的作用：
+
+1. presence_penalty（存在惩罚）:
+   - 范围通常是 -2.0 到 2.0。
+   - 这个参数用于惩罚新token基于它们是否已经出现在文本中。
+   - 正值会增加模型谈论新主题的可能性。
+   - 负值会使模型更倾向于重复已经说过的内容。
+   - 值为0时不会有影响。
+
+2. frequency_penalty（频率惩罚）:
+   - 范围通常也是 -2.0 到 2.0。
+   - 这个参数根据新token到目前为止在文本中出现的频率来惩罚它们。
+   - 正值会降低模型逐字重复同样短语的可能性。
+   - 负值会鼓励模型重复常用词。
+   - 值为0时不会有影响。
+
+这两个参数的主要区别：
+- `presence_penalty` 只关心一个token是否出现过，不管出现了多少次。
+- `frequency_penalty` 则考虑了一个token出现的次数，出现次数越多，惩罚越大。
+
+使用示例：
+1. 如果你想要模型产生更多样化的内容，可以设置较高的正值，例如：
+   ```python
+   presence_penalty=0.6, frequency_penalty=0.8
+   ```
+
+2. 如果你希望模型更专注于特定主题，可以使用较低的值或轻微的负值，例如：
+   ```python
+   presence_penalty=0, frequency_penalty=-0.2
+   ```
+
+3. 对于大多数一般用途，保持这两个值为0或接近0通常效果不错：
+   ```python
+   presence_penalty=0, frequency_penalty=0
+   ```
+
+在实际应用中，这些参数的最佳值往往需要通过实验来确定，因为它们的效果可能因不同的任务和所需的输出类型而异。对于Groq的API，你可能需要查看其文档以确认这些参数是否完全按照上述方式工作，因为不同的AI服务提供商可能会有细微的实现差异。
 
 2024-07-24  
 1.基于groq API的节点，新增了llama3.1模型的支持。
