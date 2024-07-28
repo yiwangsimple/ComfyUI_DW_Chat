@@ -67,6 +67,9 @@ presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两�
 </details> 
 
 # Usage:
+2024-07-28  
+新增了两个prompt直出节点，可以直接扩展输入的主题成符合SD或者kolors的提示词。
+![](image/demo04.png)
 2024-07-27  
 在groqchat节点中新增了reset conversation参数，值为True时，即可开启单轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。 
 
