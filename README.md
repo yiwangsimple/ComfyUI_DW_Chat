@@ -3,8 +3,9 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 # Usage:
 2024-07-27  
-在groqchat节点中新增了reset conversation参数，值为True时，即可开启单轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。  此外再解释下presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两个参数的作用： `presence_penalty` 和 `frequency_penalty` 是用于控制语言模型输出多样性和重复性的参数。让我详细解释一下它们的作用：
-
+在groqchat节点中新增了reset conversation参数，值为True时，即可开启单轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。 
+<details>
+此外再解释下presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两个参数的作用： `presence_penalty` 和 `frequency_penalty` 是用于控制语言模型输出多样性和重复性的参数。让我详细解释一下它们的作用：
 1. presence_penalty（存在惩罚）:
    - 范围通常是 -2.0 到 2.0。
    - 这个参数用于惩罚新token基于它们是否已经出现在文本中。
@@ -66,6 +67,12 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 在groqchat.py节点中，这两个参数允许用户根据具体需求调整模型输出的特性，从而在一致性和创造性之间找到适当的平衡。
 且在实际应用中，这些参数的最佳值往往需要通过实验来确定，因为它们的效果可能因不同的任务和所需的输出类型而异。对于Groq的API，你可能需要查看其文档以确认这些参数是否完全按照上述方式工作，因为不同的AI服务提供商可能会有细微的实现差异。
+
+<summary>Examples</summary>
+
+
+</details> 
+
 
 2024-07-24  
 1.基于groq API的节点，新增了llama3.1模型的支持。
