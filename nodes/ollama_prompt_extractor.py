@@ -22,7 +22,11 @@ class OllamaPromptExtractor:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model": ("STRING", {"default": "llama2"}),
+                "model": (["llama3:8b-instruct-q4_K_M", "llama3", "phi3:3.8b-mini-instruct-4k-q4_K_M", "phi3", "phi3:3.8b-mini-instruct-4k-fp16"],),
+                "extra_model": ("STRING", {
+                    "multiline": False,
+                    "default": "none"
+                }),
                 "theme": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
@@ -35,7 +39,10 @@ class OllamaPromptExtractor:
     FUNCTION = "generate_sd_prompt"
     CATEGORY = "🌙DW/prompt_utils"
 
-    def generate_sd_prompt(self, model, theme, max_tokens, temperature, prompt_type):
+    def generate_sd_prompt(self, model, extra_model, theme, max_tokens, temperature, prompt_type):
+        if extra_model != "none":
+            model = extra_model
+
         if prompt_type == "sdxl":
             system_message = """你是一位有艺术气息的Stable Diffusion prompt 助理。你的任务是根据给定的主题生成高质量的Stable Diffusion提示词。请严格遵循以下要求：
 
