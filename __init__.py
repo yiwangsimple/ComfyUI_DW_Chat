@@ -1,3 +1,5 @@
+from .api_utils import load_api_key
+
 from .nodes.groqchat import NODE_CLASS_MAPPINGS as GROQ_CLASS_MAPPINGS
 from .nodes.groqchat import NODE_DISPLAY_NAME_MAPPINGS as GROQ_DISPLAY_MAPPINGS
 from .nodes.moonshot_chat_nodes import NODE_CLASS_MAPPINGS as MOONSHOT_CLASS_MAPPINGS
@@ -37,4 +39,4 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **OLLAMA_PROMPT_EXTRACTOR_DISPLAY_MAPPINGS,
 }
 
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "load_api_key"]
