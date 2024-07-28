@@ -1,6 +1,14 @@
 import os
+import sys
 import json
 from groq import Groq
+
+# 添加父目录到 Python 路径
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from api_utils import load_api_key
 
 class GroqChatNode:
     def __init__(self):
@@ -9,19 +17,11 @@ class GroqChatNode:
         self.conversation_history = []
 
     def load_api_key(self):
-        config_path = os.path.join(os.path.dirname(__file__), 'config.json')
-        try:
-            with open(config_path, 'r') as config_file:
-                config = json.load(config_file)
-                api_key = config.get('GROQ_API_KEY')
-                if api_key:
-                    self.client = Groq(api_key=api_key)
-                else:
-                    print("Error: GROQ_API_KEY not found in config.json")
-        except FileNotFoundError:
-            print(f"Error: config.json not found at {config_path}")
-        except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in config.json at {config_path}")
+        api_key = load_api_key('GROQ_API_KEY')
+        if api_key:
+            self.client = Groq(api_key=api_key)
+        else:
+            print("Error: GROQ_API_KEY not found in api_key.ini")
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -47,7 +47,7 @@ class GroqChatNode:
 
     def generate_chat(self, model, prompt, max_tokens, temperature, top_p, system_message="", presence_penalty=0, frequency_penalty=0, reset_conversation=False):
         if not self.client:
-            return ("Error: GROQ_API_KEY not set or invalid. Please check your config.json file.",)
+            return ("Error: GROQ_API_KEY not set or invalid. Please check your api_key.ini file.",)
 
         if reset_conversation:
             self.conversation_history = []
@@ -69,7 +69,7 @@ class GroqChatNode:
             )
             response = chat_completion.choices[0].message.content
             self.conversation_history.append({"role": "assistant", "content": response})
-            return (response,)  # 只返回最新的回复
+            return (response,)
         except Exception as e:
             return (f"Error: {str(e)}",)
 

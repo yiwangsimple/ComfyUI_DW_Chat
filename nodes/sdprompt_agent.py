@@ -1,6 +1,13 @@
 import os
-import json
+import sys
 from groq import Groq
+
+# 添加父目录到 Python 路径
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from api_utils import load_api_key
 
 class SDPromptAgent:
     def __init__(self):
@@ -8,19 +15,11 @@ class SDPromptAgent:
         self.load_api_key()
 
     def load_api_key(self):
-        config_path = os.path.join(os.path.dirname(__file__), 'config.json')
-        try:
-            with open(config_path, 'r') as config_file:
-                config = json.load(config_file)
-                api_key = config.get('GROQ_API_KEY')
-                if api_key:
-                    self.client = Groq(api_key=api_key)
-                else:
-                    print("Error: GROQ_API_KEY not found in config.json")
-        except FileNotFoundError:
-            print(f"Error: config.json not found at {config_path}")
-        except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in config.json at {config_path}")
+        api_key = load_api_key('GROQ_API_KEY')
+        if api_key:
+            self.client = Groq(api_key=api_key)
+        else:
+            print("Error: GROQ_API_KEY not found in api_key.ini")
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -41,7 +40,7 @@ class SDPromptAgent:
 
     def generate_sd_prompt(self, model, theme, max_tokens, temperature, prompt_type):
         if not self.client:
-            return ("Error: GROQ_API_KEY not set or invalid. Please check your config.json file.", "")
+            return ("Error: GROQ_API_KEY not set or invalid. Please check your api_key.ini file.", "")
 
         if prompt_type == "sdxl":
             system_message = """你是一位有艺术气息的Stable Diffusion prompt 助理。你的任务是根据给定的主题生成高质量的Stable Diffusion提示词。请严格遵循以下要求：

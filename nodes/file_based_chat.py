@@ -1,16 +1,26 @@
 import os
 import json
+import sys
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import httpx
 from openai import OpenAI
 
+# 添加父目录到 Python 路径
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from api_utils import load_api_key
+
 class FileBasedChatNode:
     def __init__(self):
-        self.config = self.load_config()
+        self.api_key = load_api_key('MOONSHOT_API_KEY')
+        if not self.api_key:
+            raise ValueError("MOONSHOT_API_KEY not found in api_key.ini")
         self.client = OpenAI(
             base_url="https://api.moonshot.cn/v1",
-            api_key=self.config.get("MOONSHOT_API_KEY"),
+            api_key=self.api_key,
         )
         self.file_messages = []
         self.conversation_history = []

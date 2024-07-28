@@ -1,24 +1,22 @@
 import os
-import json
+import sys
 from openai import OpenAI
 
-def get_moonshot_api_key():
-    try:
-        config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
-        with open(config_path, 'r') as f:  
-            config = json.load(f)
-        api_key = config["MOONSHOT_API_KEY"]
-    except:
-        print("出错啦 Error: API key is required")
-        return ""
-    return api_key
+# 添加父目录到 Python 路径
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from api_utils import load_api_key
 
 class MoonshotChatBaseNode:
     def __init__(self):
         self.client = None
-        self.api_key = get_moonshot_api_key()
+        self.api_key = load_api_key('MOONSHOT_API_KEY')
         if self.api_key:
             self.client = OpenAI(api_key=self.api_key, base_url="https://api.moonshot.cn/v1")
+        else:
+            print("Error: MOONSHOT_API_KEY not found in api_key.ini")
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -42,7 +40,7 @@ class MoonshotSingleChatNode(MoonshotChatBaseNode):
 
     def generate_single_response(self, prompt, model, temperature, max_tokens, system_message=""):
         if not self.client:
-            return ("Error: MOONSHOT_API_KEY not set or invalid. Please check your config.json file.",)
+            return ("Error: MOONSHOT_API_KEY not set or invalid. Please check your api_key.ini file.",)
 
         messages = []
         if system_message:
@@ -77,7 +75,7 @@ class MoonshotMultiChatNode(MoonshotChatBaseNode):
 
     def generate_chat(self, prompt, model, temperature, max_tokens, system_message="", reset_conversation=False):
         if not self.client:
-            return ("Error: MOONSHOT_API_KEY not set or invalid. Please check your config.json file.",)
+            return ("Error: MOONSHOT_API_KEY not set or invalid. Please check your api_key.ini file.",)
 
         if reset_conversation:
             self.conversation_history = []
@@ -106,7 +104,7 @@ class MoonshotMultiChatNode(MoonshotChatBaseNode):
         for message in self.conversation_history:
             formatted_message = f"{message['role']}: {message['content']}"
             formatted_history.append(formatted_message)
-            formatted_history.append("-" * 40)  # 添加分隔线
+            formatted_history.append("-" * 40)
         return "\n".join(formatted_history)
 
 NODE_CLASS_MAPPINGS = {
