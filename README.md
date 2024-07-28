@@ -67,10 +67,7 @@ Updated image backpropagation nodes based on Google's open-source PaliGemma visi
 
 在groqchat.py节点中，这两个参数允许用户根据具体需求调整模型输出的特性，从而在一致性和创造性之间找到适当的平衡。
 且在实际应用中，这些参数的最佳值往往需要通过实验来确定，因为它们的效果可能因不同的任务和所需的输出类型而异。对于Groq的API，你可能需要查看其文档以确认这些参数是否完全按照上述方式工作，因为不同的AI服务提供商可能会有细微的实现差异。
-
-<summary>Examples</summary>
-
-
+<summary>参数详解</summary>
 </details> 
 
 
