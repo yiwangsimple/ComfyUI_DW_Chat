@@ -1,9 +1,6 @@
 # comfy-groqchat
 Updated image backpropagation nodes based on Google's open-source PaliGemma vision model. The model used in the node is a fine-tuned version of gokayfem's big brother, special thanks for that! Content generation with open source models in comfyui via graq api implementation.
 
-# Usage:
-2024-07-27  
-在groqchat节点中新增了reset conversation参数，值为True时，即可开启单轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。 
 <details>
 presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两个参数的作用： `presence_penalty` 和 `frequency_penalty` 是用于控制语言模型输出多样性和重复性的参数。让我详细解释一下它们的作用：
 1. presence_penalty（存在惩罚）:
@@ -70,6 +67,9 @@ presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两�
 <summary>参数详解</summary>
 </details> 
 
+# Usage:
+2024-07-27  
+在groqchat节点中新增了reset conversation参数，值为True时，即可开启单轮对话功能；新增了prompt_extractor.py节点，分来分离文本中的正负向提示词。 
 
 2024-07-24  
 1.基于groq API的节点，新增了llama3.1模型的支持。
