@@ -2,27 +2,46 @@ import os
 import json
 import requests
 
-class OllamaPromptExtractor:
-    def __init__(self):
-        self.base_url = "http://localhost:11434/api/generate"
-        self.load_config()
+def get_available_models(base_url):
+    try:
+        response = requests.get(f"{base_url}/api/tags")
+        if response.status_code == 200:
+            models = response.json()['models']
+            return [model['name'] for model in models]
+        else:
+            print(f"Error fetching models: {response.status_code}")
+            return []
+    except requests.RequestException as e:
+        print(f"Error connecting to Ollama: {str(e)}")
+        return []
 
-    def load_config(self):
+class OllamaPromptExtractor:
+    base_url = "http://localhost:11434"
+    available_models = []
+
+    @classmethod
+    def initialize(cls):
+        cls.load_config()
+        cls.available_models = get_available_models(cls.base_url)
+
+    @classmethod
+    def load_config(cls):
         config_path = os.path.join(os.path.dirname(__file__), 'config.json')
         try:
             with open(config_path, 'r') as config_file:
                 config = json.load(config_file)
-                self.base_url = config.get('OLLAMA_API_URL', self.base_url)
+                cls.base_url = config.get('OLLAMA_API_URL', cls.base_url)
+            print(f"Loaded Ollama API URL: {cls.base_url}")
         except FileNotFoundError:
-            print(f"Warning: config.json not found at {config_path}. Using default URL.")
+            print(f"Warning: config.json not found at {config_path}. Using default URL: {cls.base_url}")
         except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in config.json at {config_path}. Using default URL.")
+            print(f"Error: Invalid JSON in config.json at {config_path}. Using default URL: {cls.base_url}")
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model": (["llama3:8b-instruct-q4_K_M", "llama3", "phi3:3.8b-mini-instruct-4k-q4_K_M", "phi3", "phi3:3.8b-mini-instruct-4k-fp16"],),
+                "model": (cls.available_models,) if cls.available_models else (["No models found"],),
                 "extra_model": ("STRING", {
                     "multiline": False,
                     "default": "none"
@@ -31,6 +50,7 @@ class OllamaPromptExtractor:
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
                 "prompt_type": (["sdxl", "kolors"],),
+                "debug": (["enable", "disable"],),
             },
         }
 
@@ -39,7 +59,7 @@ class OllamaPromptExtractor:
     FUNCTION = "generate_sd_prompt"
     CATEGORY = "🌙DW/prompt_utils"
 
-    def generate_sd_prompt(self, model, extra_model, theme, max_tokens, temperature, prompt_type):
+    def generate_sd_prompt(self, model, extra_model, theme, max_tokens, temperature, prompt_type, debug):
         if extra_model != "none":
             model = extra_model
 
@@ -79,8 +99,13 @@ class OllamaPromptExtractor:
 
         prompt = f"根据以下主题生成{'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors'}提示词：{theme}"
 
+        if debug == "enable":
+            print(f"Attempting to connect to Ollama at: {self.base_url}")
+            print(f"Using model: {model}")
+            print(f"Prompt: {prompt}")
+
         try:
-            response = requests.post(self.base_url, json={
+            response = requests.post(f"{self.base_url}/api/generate", json={
                 "model": model,
                 "prompt": f"{system_message}\n\nHuman: {prompt}\n\nAssistant:",
                 "stream": False,
@@ -90,6 +115,9 @@ class OllamaPromptExtractor:
             response.raise_for_status()
             result = response.json()
             generated_text = result['response']
+
+            if debug == "enable":
+                print(f"Generated text: {generated_text}")
 
             # 分割正面和负面提示词
             if prompt_type == "sdxl":
@@ -106,7 +134,12 @@ class OllamaPromptExtractor:
             
             return (positive_prompt, negative_prompt)
         except requests.RequestException as e:
-            return (f"Error: {str(e)}", "")
+            error_message = f"Error: {str(e)}"
+            if debug == "enable":
+                print(error_message)
+            return (error_message, "")
+
+OllamaPromptExtractor.initialize()
 
 NODE_CLASS_MAPPINGS = {
     "OllamaPromptExtractor": OllamaPromptExtractor
