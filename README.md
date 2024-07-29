@@ -68,6 +68,11 @@ presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两�
 </details> 
 
 # Usage:
+2024-07-29  
+新增了基于deepseek API的个性化翻译节点，结合吴恩达大佬的Agentic workflow流程，表现出出色的翻译水准。具体用法看下面示例：   
+![](image/demo05.png)  
+设置country参数来对翻译结果进行润色  
+![](image/demo06.png)![](image/demo07.png)  
 2024-07-28  
 新增了两个prompt直出节点，可以直接扩展输入的主题成符合SD或者kolors的提示词。
 ![](image/demo04.png)
