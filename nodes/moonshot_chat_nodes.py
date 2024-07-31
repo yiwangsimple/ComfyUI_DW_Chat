@@ -37,7 +37,8 @@ class MoonshotChatBaseNode:
 class MoonshotSingleChatNode(MoonshotChatBaseNode):
     FUNCTION = "generate_single_response"
     RETURN_NAMES = ("response",)
-
+    CATEGORY = "🌙DW/moonshotChat"
+    
     def generate_single_response(self, prompt, model, temperature, max_tokens, system_message=""):
         if not self.client:
             return ("Error: MOONSHOT_API_KEY not set or invalid. Please check your api_key.ini file.",)
