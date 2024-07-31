@@ -102,7 +102,7 @@ Groq nodes are based on the groq cloud API.The following four models are current
 * mixtral-8x7b-32768
 * llama3-8b-8192
 
-The API was requested through https://console.groq.com/keys, which had not launched a paid plan as of the time of publication. Fill the api key into the "config.json" file.
+The API was requested through https://console.groq.com/keys, which had not launched a paid plan as of the time of publication. 
 However, there are corresponding restrictions, as shown below:
 ![](image/limits.png)
 ____
