@@ -26,13 +26,7 @@ class FileBasedChatNode:
         self.conversation_history = []
         self.cache_tag = None
 
-    def load_config(self):
-        config_path = Path(__file__).parent / "config.json"
-        if config_path.exists():
-            with open(config_path, "r") as f:
-                return json.load(f)
-        else:
-            raise FileNotFoundError(f"Config file not found: {config_path}")
+    
 
     @classmethod
     def INPUT_TYPES(s):
