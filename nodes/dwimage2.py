@@ -68,7 +68,7 @@ class Moondream2model:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "moondream2_generate_predictions"
-    CATEGORY = "🌙DW/dwimage2"
+    CATEGORY = "🌙DW/ImageToText"
 
     def moondream2_generate_predictions(self, image, text_input):
         try:
