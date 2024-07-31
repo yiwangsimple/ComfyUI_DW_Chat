@@ -29,7 +29,7 @@ class DeepSeekTranslator:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "translate_and_improve"
-    CATEGORY = "🌙DW/text"
+    CATEGORY = "🌙DW/deepseek_translater"
 
     def __init__(self):
         self.api_url = "https://api.deepseek.com/v1/chat/completions"
