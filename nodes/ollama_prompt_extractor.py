@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import random
 
 def get_available_models(base_url):
     try:
@@ -50,7 +51,7 @@ class OllamaPromptExtractor:
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
                 "prompt_type": (["sdxl", "kolors"],),
-                "debug": (["enable", "disable"],),
+                "seed": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
             },
         }
 
@@ -59,7 +60,7 @@ class OllamaPromptExtractor:
     FUNCTION = "generate_sd_prompt"
     CATEGORY = "🌙DW/prompt_utils"
 
-    def generate_sd_prompt(self, model, extra_model, theme, max_tokens, temperature, prompt_type, debug):
+    def generate_sd_prompt(self, model, extra_model, theme, max_tokens, temperature, prompt_type, seed):
         if extra_model != "none":
             model = extra_model
 
@@ -99,10 +100,10 @@ class OllamaPromptExtractor:
 
         prompt = f"根据以下主题生成{'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors'}提示词：{theme}"
 
-        if debug == "enable":
-            print(f"Attempting to connect to Ollama at: {self.base_url}")
-            print(f"Using model: {model}")
-            print(f"Prompt: {prompt}")
+        # 设置随机种子
+        if seed == -1:
+            seed = random.randint(0, 0xffffffffffffffff)
+        random.seed(seed)
 
         try:
             response = requests.post(f"{self.base_url}/api/generate", json={
@@ -110,14 +111,12 @@ class OllamaPromptExtractor:
                 "prompt": f"{system_message}\n\nHuman: {prompt}\n\nAssistant:",
                 "stream": False,
                 "max_tokens": max_tokens,
-                "temperature": temperature
+                "temperature": temperature,
+                "seed": seed
             })
             response.raise_for_status()
             result = response.json()
             generated_text = result['response']
-
-            if debug == "enable":
-                print(f"Generated text: {generated_text}")
 
             # 分割正面和负面提示词
             if prompt_type == "sdxl":
@@ -135,8 +134,6 @@ class OllamaPromptExtractor:
             return (positive_prompt, negative_prompt)
         except requests.RequestException as e:
             error_message = f"Error: {str(e)}"
-            if debug == "enable":
-                print(error_message)
             return (error_message, "")
 
 OllamaPromptExtractor.initialize()
