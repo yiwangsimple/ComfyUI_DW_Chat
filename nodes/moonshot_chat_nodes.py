@@ -37,7 +37,7 @@ class MoonshotChatBaseNode:
 class MoonshotSingleChatNode(MoonshotChatBaseNode):
     FUNCTION = "generate_single_response"
     RETURN_NAMES = ("response",)
-    CATEGORY = "🌙DW/moonshotChat"
+    CATEGORY = "🌙DW/Chat"
     
     def generate_single_response(self, prompt, model, temperature, max_tokens, system_message=""):
         if not self.client:
@@ -62,7 +62,7 @@ class MoonshotSingleChatNode(MoonshotChatBaseNode):
 class MoonshotMultiChatNode(MoonshotChatBaseNode):
     FUNCTION = "generate_chat"
     RETURN_NAMES = ("chat_history",)
-    CATEGORY = "🌙DW/moonshotChat"
+    CATEGORY = "🌙DW/Chat"
     
     def __init__(self):
         super().__init__()
@@ -114,6 +114,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "MoonshotSingleChatNode": "🌙Moonshot Single Chat",
-    "MoonshotMultiChatNode": "🌙Moonshot Multi Chat"
+    "MoonshotSingleChatNode": "Moonshot Single Chat",
+    "MoonshotMultiChatNode": "Moonshot Multi Chat"
 }

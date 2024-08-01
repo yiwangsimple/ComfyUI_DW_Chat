@@ -42,7 +42,7 @@ class FileBasedChatNode:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "chat"
-    CATEGORY = "🌙DW/fileBaseChat"
+    CATEGORY = "🌙DW/Chat"
 
     def upload_files(self, files: List[str]) -> List[Dict[str, Any]]:
         messages = []

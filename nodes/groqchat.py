@@ -43,7 +43,7 @@ class GroqChatNode:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "generate_chat"
-    CATEGORY = "🌙DW/groqchat"
+    CATEGORY = "🌙DW/Chat"
 
     def generate_chat(self, model, prompt, max_tokens, temperature, top_p, system_message="", presence_penalty=0, frequency_penalty=0, reset_conversation=False):
         if not self.client:
