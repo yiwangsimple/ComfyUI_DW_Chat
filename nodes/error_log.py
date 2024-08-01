@@ -1,4 +1,5 @@
 import os
+import re
 
 class ErrorLogNode:
     @classmethod
@@ -10,25 +11,29 @@ class ErrorLogNode:
     CATEGORY = "🌙DW"
 
     def get_error_log(self):
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        log_dir = os.path.join(base_dir, "..", "..", "comfyui")
+        log_dir = "/Users/weiwei/ComfyUI"
         log_path = os.path.join(log_dir, "comfyui.log")
 
-        debug_info = f"Base Directory: {base_dir}\nLog Directory: {log_dir}\nLog Path: {log_path}\n"
-
         if not os.path.exists(log_dir):
-            return (f"{debug_info}日志目录不存在。",)
+            return ("日志目录不存在。",)
 
         if not os.path.exists(log_path):
-            return (f"{debug_info}未找到日志文件。",)
+            return ("未找到日志文件。",)
 
         try:
             with open(log_path, "r", encoding="utf-8") as f:
                 file_content = f.read()
-            log_lines = file_content.splitlines()[-1000:]  # 只返回最后的1000行
-            return ("\n".join(log_lines),)
+            
+            # 使用正则表达式匹配包含 "ERROR"、"Exception"、"Traceback"、"Failed"、"Error" 的行
+            error_pattern = re.compile(r'.*(ERROR|Exception|Traceback|Failed|Error).*', re.IGNORECASE)
+            error_lines = [line for line in file_content.splitlines() if error_pattern.match(line)]
+            
+            if error_lines:
+                return ("\n".join(error_lines),)
+            else:
+                return ("未找到错误信息。",)
         except Exception as e:
-            return (f"{debug_info}读取日志文件 '{log_path}' 时发生错误：{str(e)}",)
+            return (f"读取日志文件 '{log_path}' 时发生错误：{str(e)}",)
 
 NODE_CLASS_MAPPINGS = {
     "ErrorLogNode": ErrorLogNode
