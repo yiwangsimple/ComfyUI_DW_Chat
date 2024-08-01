@@ -68,6 +68,9 @@ presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两�
 </details> 
 
 # Usage:
+2024-08-01  
+新增了deepseek chat节点，除满足普通对话外，还内置了5种角色"报错助手", "标题党", "灵感助手", "小红书", "信息提取"；
+![](image/demo08.png)  
 2024-07-29  
 新增了基于deepseek API的个性化翻译节点，结合吴恩达大佬的Agentic workflow流程，表现出出色的翻译水准。具体用法看下面示例：   
 ![](image/demo05.png)  
