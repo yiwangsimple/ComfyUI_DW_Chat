@@ -22,21 +22,7 @@ class OllamaPromptExtractor:
 
     @classmethod
     def initialize(cls):
-        cls.load_config()
         cls.available_models = get_available_models(cls.base_url)
-
-    @classmethod
-    def load_config(cls):
-        config_path = os.path.join(os.path.dirname(__file__), 'config.json')
-        try:
-            with open(config_path, 'r') as config_file:
-                config = json.load(config_file)
-                cls.base_url = config.get('OLLAMA_API_URL', cls.base_url)
-            print(f"Loaded Ollama API URL: {cls.base_url}")
-        except FileNotFoundError:
-            print(f"Warning: config.json not found at {config_path}. Using default URL: {cls.base_url}")
-        except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in config.json at {config_path}. Using default URL: {cls.base_url}")
 
     @classmethod
     def INPUT_TYPES(cls):
