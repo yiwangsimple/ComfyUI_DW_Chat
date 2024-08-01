@@ -1,6 +1,7 @@
 import os
 import sys
 from groq import Groq
+import random
 
 # 添加父目录到 Python 路径
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +31,7 @@ class SDPromptAgent:
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
                 "prompt_type": (["sdxl", "kolors"],),
+                "seed": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
             },
         }
 
@@ -38,7 +40,7 @@ class SDPromptAgent:
     FUNCTION = "generate_sd_prompt"
     CATEGORY = "🌙DW/prompt_utils"
 
-    def generate_sd_prompt(self, model, theme, max_tokens, temperature, prompt_type):
+    def generate_sd_prompt(self, model, theme, max_tokens, temperature, prompt_type, seed):
         if not self.client:
             return ("Error: GROQ_API_KEY not set or invalid. Please check your api_key.ini file.", "")
 
@@ -78,6 +80,11 @@ class SDPromptAgent:
 
         prompt = f"根据以下主题生成{'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors'}提示词：{theme}"
 
+        # 设置随机种子
+        if seed == -1:
+            seed = random.randint(0, 0xffffffffffffffff)
+        random.seed(seed)
+
         try:
             chat_completion = self.client.chat.completions.create(
                 model=model,
@@ -86,7 +93,8 @@ class SDPromptAgent:
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=max_tokens,
-                temperature=temperature
+                temperature=temperature,
+                seed=seed
             )
             response = chat_completion.choices[0].message.content
 
