@@ -1,5 +1,5 @@
 # comfy-groqchat
-目前节点的对话功能基于Groq API（ https://console.groq.com/keys ）、  kimi API ( https://platform.moonshot.cn/console/api-keys )  和deepseek API（https://platform.deepseek.com/api_keys）， 请在相应的网站获取，  填入到将新的api放到这个文件中 api_key.ini.example  后缀改成.ini文件中。通过API的调用，可以实现单轮或者多轮chat，以实现正反提示词生成和报错指南等，此外节点还整合了基于moondream2和PaliGemma大模型的的图片反推节点。
+目前节点的对话功能基于Groq API（ https://console.groq.com/keys ）、  kimi API ( https://platform.moonshot.cn/console/api-keys )  和deepseek API（https://platform.deepseek.com/api_keys）， 请在相应的网站获取，  填入到将新的api放到这个文件中 api_key.ini。通过API的调用，可以实现单轮或者多轮chat，以实现正反提示词生成和报错指南等，此外节点还整合了基于moondream2和PaliGemma大模型的的图片反推节点。
 <details>
 presence_penalty（存在惩罚）和frequency_penalty （频率惩罚）这两个参数的作用： `presence_penalty` 和 `frequency_penalty` 是用于控制语言模型输出多样性和重复性的参数。让我详细解释一下它们的作用。          
 
