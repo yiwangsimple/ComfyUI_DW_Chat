@@ -11,11 +11,11 @@ class ErrorLogNode:
     CATEGORY = "🌙DW"
 
     def get_error_log(self):
-        log_dir = "/Users/weiwei/ComfyUI"
-        log_path = os.path.join(log_dir, "comfyui.log")
-
-        if not os.path.exists(log_dir):
-            return ("日志目录不存在。",)
+        # 获取当前文件的目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 向上导航三级目录到ComfyUI根目录
+        comfyui_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+        log_path = os.path.join(comfyui_root, "comfyui.log")
 
         if not os.path.exists(log_path):
             return ("未找到日志文件。",)
