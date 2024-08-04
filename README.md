@@ -68,6 +68,8 @@ And in practice, the optimal values of these parameters often need to be determi
 </details> 
 
 # Usage:
+2024-08-04  
+Add gemma2 related node, please manually download the model to ComfyUI/models/LLavacheckpoints/gemma-2-2b-it, model address https://huggingface.co/google/gemma-2-2b-it/tree/main
 2024-08-02
 Added a feature to dynamically display node computation time, which can be turned off in the settings. (Inspired by ty0x2333's ComfyUI-Dev-Utils for time display code, thanks to the author)
 ![](image/demo10.png) 
