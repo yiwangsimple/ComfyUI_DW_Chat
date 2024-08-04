@@ -15,10 +15,17 @@ class ErrorLogNode:
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # 向上导航三级目录到ComfyUI根目录
         comfyui_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-        log_path = os.path.join(comfyui_root, "comfyui.log")
-
-        if not os.path.exists(log_path):
+        
+        # 使用正则表达式匹配日志文件
+        log_pattern = re.compile(r'comfyui.*\.log')
+        log_files = [f for f in os.listdir(comfyui_root) if log_pattern.match(f)]
+        
+        if not log_files:
             return ("未找到日志文件。",)
+        
+        # 使用最新的日志文件
+        latest_log = max(log_files, key=lambda f: os.path.getmtime(os.path.join(comfyui_root, f)))
+        log_path = os.path.join(comfyui_root, latest_log)
 
         try:
             with open(log_path, "r", encoding="utf-8") as f:
