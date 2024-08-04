@@ -28,6 +28,13 @@ from .nodes.error_log import NODE_DISPLAY_NAME_MAPPINGS as ERROR_LOG_DISPLAY_MAP
 from .nodes.execution_time import NODE_CLASS_MAPPINGS as EXECUTION_TIME_CLASS_MAPPINGS
 from .nodes.execution_time import NODE_DISPLAY_NAME_MAPPINGS as EXECUTION_TIME_DISPLAY_MAPPINGS
 
+#导入gemmma2相关节点
+from .nodes.gemma_node import NODE_CLASS_MAPPINGS as GEMMA_NODE_CLASS_MAPPINGS
+from .nodes.gemma_node import NODE_DISPLAY_NAME_MAPPINGS as GEMMA_NODE_DISPLAY_MAPPINGS
+from .nodes.gemma2prompt import NODE_CLASS_MAPPINGS as GEMMA2_PROMPT_CLASS_MAPPINGS
+from .nodes.gemma2prompt import NODE_DISPLAY_NAME_MAPPINGS as GEMMA2_PROMPT_DISPLAY_MAPPINGS
+
+# 定义执行时间统计函数
 def load_javascript(web_directory):
     js_file_path = os.path.join(web_directory, "executionTime.js")
     if os.path.exists(js_file_path):
@@ -52,6 +59,8 @@ NODE_CLASS_MAPPINGS = {
     **DEEPSEEK_CHAT_CLASS_MAPPINGS,
     **ERROR_LOG_CLASS_MAPPINGS, 
     **EXECUTION_TIME_CLASS_MAPPINGS,  # 添加执行时间插件的类映射
+    **GEMMA2_PROMPT_CLASS_MAPPINGS,  # 添加 Gemma2PromptNode 的类映射
+    **GEMMA_NODE_CLASS_MAPPINGS,  # 添加 GemmaNode 的类映射
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -67,6 +76,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **DEEPSEEK_CHAT_DISPLAY_MAPPINGS,
     **ERROR_LOG_DISPLAY_MAPPINGS,
     **EXECUTION_TIME_DISPLAY_MAPPINGS,  # 添加执行时间插件的显示名称映射
+    **GEMMA2_PROMPT_DISPLAY_MAPPINGS,  # 添加 Gemma2PromptNode 的显示名称映射
+    **GEMMA_NODE_DISPLAY_MAPPINGS,  # 添加 GemmaNode 的显示名称映射
 }
 
 
