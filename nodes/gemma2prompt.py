@@ -80,15 +80,19 @@ Generate the prompt directly without any explanations or additional text. Do not
         full_prompt = f"<start_of_turn>user\n{system_message}\n\n{prompt}\n<end_of_turn>\n<start_of_turn>model\n"
         
         input_ids = self.tokenizer(full_prompt, return_tensors="pt").input_ids.to(self.device)
+        attention_mask = torch.ones_like(input_ids)
+        
+        pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else self.tokenizer.eos_token_id - 1
         
         with torch.no_grad():
             outputs = self.model.generate(
                 input_ids,
+                attention_mask=attention_mask,
                 max_new_tokens=max_tokens,
                 temperature=0.7,
                 top_p=top_p,
                 do_sample=True,
-                pad_token_id=self.tokenizer.eos_token_id,
+                pad_token_id=pad_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
             )
 
@@ -114,9 +118,9 @@ Generate the prompt directly without any explanations or additional text. Do not
         return (positive_prompt, negative_prompt)
 
     def load_model(self):
-        model_path = Path("models/LLavaCheckpoints/gemma-2-2b-it")
+        model_path = self.get_model_path()
         
-        if not model_path.exists() or not any(model_path.iterdir()):
+        if not os.path.exists(model_path) or not any(os.scandir(model_path)):
             raise RuntimeError(f"Model not found in {model_path}. Please manually download the model from https://huggingface.co/google/gemma-2b-it and place it in the specified directory.")
 
         try:
@@ -138,6 +142,19 @@ Generate the prompt directly without any explanations or additional text. Do not
 
         if self.model is None or self.tokenizer is None:
             raise RuntimeError("Failed to load the model or tokenizer")
+
+    def get_model_path(self):
+        possible_paths = [
+            Path("models/LLavacheckpoints/gemma-2-2b-it"),
+            Path("LLavacheckpoints/gemma-2-2b-it"),
+            Path("gemma-2-2b-it"),
+        ]
+        
+        for path in possible_paths:
+            if path.exists() and any(path.iterdir()):
+                return str(path)
+        
+        raise RuntimeError("Could not find the Gemma model. Please ensure it's placed in one of the expected directories.")
 
     def unload_model(self):
         del self.model

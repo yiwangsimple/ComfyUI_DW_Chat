@@ -42,7 +42,7 @@ class DeepSeekChatNode:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "chat"
-    CATEGORY = "🌙DW/Chat"
+    CATEGORY = "🌙DW/MultiRole"
 
     def chat(self, role, message, max_tokens, reset_conversation=False):
         if not self.api_key:
