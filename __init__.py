@@ -33,6 +33,8 @@ from .nodes.gemma_node import NODE_CLASS_MAPPINGS as GEMMA_NODE_CLASS_MAPPINGS
 from .nodes.gemma_node import NODE_DISPLAY_NAME_MAPPINGS as GEMMA_NODE_DISPLAY_MAPPINGS
 from .nodes.gemma2prompt import NODE_CLASS_MAPPINGS as GEMMA2_PROMPT_CLASS_MAPPINGS
 from .nodes.gemma2prompt import NODE_DISPLAY_NAME_MAPPINGS as GEMMA2_PROMPT_DISPLAY_MAPPINGS
+from .nodes.gemma_translation import NODE_CLASS_MAPPINGS as GEMMA_TRANSLATION_CLASS_MAPPINGS
+from .nodes.gemma_translation import NODE_DISPLAY_NAME_MAPPINGS as GEMMA_TRANSLATION_DISPLAY_MAPPINGS
 
 # 定义执行时间统计函数
 def load_javascript(web_directory):
@@ -61,6 +63,8 @@ NODE_CLASS_MAPPINGS = {
     **EXECUTION_TIME_CLASS_MAPPINGS,  # 添加执行时间插件的类映射
     **GEMMA2_PROMPT_CLASS_MAPPINGS,  # 添加 Gemma2PromptNode 的类映射
     **GEMMA_NODE_CLASS_MAPPINGS,  # 添加 GemmaNode 的类映射
+    **GEMMA_TRANSLATION_CLASS_MAPPINGS,  # 添加 GemmaTranslationNode 的类映射
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -78,6 +82,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **EXECUTION_TIME_DISPLAY_MAPPINGS,  # 添加执行时间插件的显示名称映射
     **GEMMA2_PROMPT_DISPLAY_MAPPINGS,  # 添加 Gemma2PromptNode 的显示名称映射
     **GEMMA_NODE_DISPLAY_MAPPINGS,  # 添加 GemmaNode 的显示名称映射
+    **GEMMA_TRANSLATION_DISPLAY_MAPPINGS,  # 添加 GemmaTranslationNode 的显示名称映射
 }
 
 
