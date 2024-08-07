@@ -28,12 +28,19 @@ from .nodes.error_log import NODE_DISPLAY_NAME_MAPPINGS as ERROR_LOG_DISPLAY_MAP
 from .nodes.execution_time import NODE_CLASS_MAPPINGS as EXECUTION_TIME_CLASS_MAPPINGS
 from .nodes.execution_time import NODE_DISPLAY_NAME_MAPPINGS as EXECUTION_TIME_DISPLAY_MAPPINGS
 
-#导入gemmma2相关节点
+# 导入gemma2相关节点
 from .nodes.gemma_node import NODE_CLASS_MAPPINGS as GEMMA_NODE_CLASS_MAPPINGS
 from .nodes.gemma_node import NODE_DISPLAY_NAME_MAPPINGS as GEMMA_NODE_DISPLAY_MAPPINGS
 from .nodes.gemma2prompt import NODE_CLASS_MAPPINGS as GEMMA2_PROMPT_CLASS_MAPPINGS
 from .nodes.gemma2prompt import NODE_DISPLAY_NAME_MAPPINGS as GEMMA2_PROMPT_DISPLAY_MAPPINGS
 
+# 修改 github_link_node 的导入方式
+from .nodes.github_link_node import NODE_CLASS_MAPPINGS as GITHUB_LINK_NODE_CLASS_MAPPINGS
+from .nodes.github_link_node import NODE_DISPLAY_NAME_MAPPINGS as GITHUB_LINK_NODE_DISPLAY_MAPPINGS
+from .nodes.github_link_node import WEB_DIRECTORY, initialize_github_links
+
+# 调用初始化函数
+initialize_github_links()
 
 # 定义执行时间统计函数
 def load_javascript(web_directory):
@@ -59,11 +66,10 @@ NODE_CLASS_MAPPINGS = {
     **DEEPSEEK_TRANSLATOR_CLASS_MAPPINGS,
     **DEEPSEEK_CHAT_CLASS_MAPPINGS,
     **ERROR_LOG_CLASS_MAPPINGS, 
-    **EXECUTION_TIME_CLASS_MAPPINGS,  # 添加执行时间插件的类映射
-    **GEMMA2_PROMPT_CLASS_MAPPINGS,  # 添加 Gemma2PromptNode 的类映射
-    **GEMMA_NODE_CLASS_MAPPINGS,  # 添加 GemmaNode 的类映射
-
-
+    **EXECUTION_TIME_CLASS_MAPPINGS,
+    **GEMMA2_PROMPT_CLASS_MAPPINGS,
+    **GEMMA_NODE_CLASS_MAPPINGS,
+    **GITHUB_LINK_NODE_CLASS_MAPPINGS
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -78,13 +84,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **DEEPSEEK_TRANSLATOR_DISPLAY_MAPPINGS,
     **DEEPSEEK_CHAT_DISPLAY_MAPPINGS,
     **ERROR_LOG_DISPLAY_MAPPINGS,
-    **EXECUTION_TIME_DISPLAY_MAPPINGS,  # 添加执行时间插件的显示名称映射
-    **GEMMA2_PROMPT_DISPLAY_MAPPINGS,  # 添加 Gemma2PromptNode 的显示名称映射
-    **GEMMA_NODE_DISPLAY_MAPPINGS,  # 添加 GemmaNode 的显示名称映射
-    
+    **EXECUTION_TIME_DISPLAY_MAPPINGS,
+    **GEMMA2_PROMPT_DISPLAY_MAPPINGS,
+    **GEMMA_NODE_DISPLAY_MAPPINGS,
+    **GITHUB_LINK_NODE_DISPLAY_MAPPINGS
 }
-
-
-WEB_DIRECTORY = "./web"
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "load_api_key"]
