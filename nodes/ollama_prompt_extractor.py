@@ -36,7 +36,7 @@ class OllamaPromptExtractor:
                 "theme": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 1000, "min": 1, "max": 32768}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0, "max": 2, "step": 0.1}),
-                "prompt_type": (["sdxl", "kolors"],),
+                "prompt_type": (["sdxl", "kolors", "flux"],),
                 "seed": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
             },
         }
@@ -70,7 +70,7 @@ class OllamaPromptExtractor:
    - 如果是人物主题，还要包含"skin spots,acnes,skin blemishes,age spot,mutated hands,mutated fingers,deformed,bad anatomy,disfigured,poorly drawn face,extra limb,ugly,poorly drawn hands,missing limb,floating limbs,disconnected limbs,out of focus,long neck,long body,extra fingers,fewer fingers,,(multi nipples),bad hands,signature,username,bad feet,blurry,bad body"
 
 请直接生成prompt，不要包含任何解释或额外文字。只使用英文，即使主题是中文。"""
-        else:  # prompt_type == "kolors"
+        elif prompt_type == "kolors":
             system_message = """你是一位熟练的AI艺术生成模型kolors的提示工程师，类似于DALLE-3。你对提示词的复杂性有深入的理解，确保生成的艺术作品符合用户的期望。你的任务是根据给定的主题生成高质量的kolors提示词。请严格遵循以下要求：
 
 1. 输出格式：
@@ -83,8 +83,27 @@ class OllamaPromptExtractor:
    - 确保内容与主题相符，画面整体和谐
 
 请直接生成prompt，不要包含任何解释或额外文字。不要包含负向提示词。"""
+        else:  # prompt_type == "flux"
+            system_message = """你是一位熟练的AI艺术生成模型flux的提示工程师，类似于DALLE-3。你对提示词的复杂性有深入的理解，确保生成的艺术作品符合用户的期望。你的任务是根据给定的主题生成高质量的flux提示词。请严格遵循以下要求：
 
-        prompt = f"根据以下主题生成{'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors'}提示词：{theme}"
+1. 输出格式：
+   - 直接输出英文提示词，不需要任何标题或前缀
+
+2. 提示词要求：
+   - 使用自然语言描述，明确＋丰富
+   - 先把最难生成的部分写在前面（而非主角），然后写必要的元素和细节，接着是背景，然后是风格、颜色等
+   - 加入画面场景细节或人物细节，让图像看起来更充实和合理
+   - 确保内容与主题相符，画面整体和谐
+   - 使用精确的形容词和描述性语言来传达你想要的效果
+   - 可以指定艺术风格、光线和氛围来增强画面质量
+   - 如果涉及人物，可以描述表情、姿势和服装等细节
+   - 考虑添加环境元素，如天气、时间或季节，以增加画面的深度
+   - 尽可能详细且丰富的描速画面的所有内容
+   - 不少于160个单词
+
+请直接生成prompt，不要包含任何解释或额外文字。不要包含负向提示词。"""
+
+        prompt = f"根据以下主题生成{'Stable Diffusion' if prompt_type == 'sdxl' else prompt_type}提示词：{theme}"
 
         # 设置随机种子
         if seed == -1:
@@ -113,9 +132,12 @@ class OllamaPromptExtractor:
                 else:
                     positive_prompt = generated_text
                     negative_prompt = ""
-            else:  # prompt_type == "kolors"
+            elif prompt_type == "kolors":
                 positive_prompt = generated_text.strip()
                 negative_prompt = "低质量，坏手，水印"
+            else:  # prompt_type == "flux"
+                positive_prompt = generated_text.strip()
+                negative_prompt = "low quality, bad hands, watermark"
             
             return (positive_prompt, negative_prompt)
         except requests.RequestException as e:
