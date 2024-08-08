@@ -5,11 +5,16 @@ const iconSvg = `<svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="
 
 const cacheNodePositonMap = new Map();
 
+function formatExecutionTime(time) {
+    return `${(time / 1000.0).toFixed(2)}s`;
+}
+
 const drawPaperPlaneIcon = function(node, orig, restArgs) {
   let ctx = restArgs[0];
   const r = orig?.apply?.(node, restArgs);
 
   if (!node.flags.collapsed && node.constructor.title_mode != LiteGraph.NO_TITLE) {
+    // Draw paper plane icon
     const paperPlaneIcon = '✈️';
     let fgColor = "white";
 
@@ -37,6 +42,36 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
       ctx.fillStyle = 'white';
       ctx.fillText(node.type, node.size[0] / 2 - sz2.width / 2, node.size[1] / 2);
       ctx.restore();
+    }
+
+    // Draw execution time
+    if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
+      let text = "";
+      let bgColor = "#ffa500"; // Orange for ongoing execution
+
+      if (node.ty_et_start_time !== undefined) {
+          const currentTime = performance.now();
+          const elapsedTime = currentTime - node.ty_et_start_time;
+          text = formatExecutionTime(elapsedTime);
+      } else if (node.ty_et_execution_time !== undefined) {
+          text = formatExecutionTime(node.ty_et_execution_time);
+          bgColor = "#29b560"; // Green for completed execution
+      }
+
+      if (text) {
+          ctx.save();
+          ctx.font = "12px sans-serif";
+          const textSize = ctx.measureText(text);
+          ctx.fillStyle = bgColor;
+          ctx.beginPath();
+          const paddingHorizontal = 6;
+          ctx.roundRect(0, -LiteGraph.NODE_TITLE_HEIGHT - 20, textSize.width + paddingHorizontal * 2, 20, 5);
+          ctx.fill();
+
+          ctx.fillStyle = "white";
+          ctx.fillText(text, paddingHorizontal, -LiteGraph.NODE_TITLE_HEIGHT - paddingHorizontal);
+          ctx.restore();
+      }
     }
   }
   return r
