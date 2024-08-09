@@ -24,7 +24,7 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
     ctx.beginPath();
     ctx.fillStyle = fgColor;
     const x = 4; // Left position
-    const y = -30; // Top position
+    const y = -34; // Top position
     ctx.fillText(paperPlaneIcon, x, y);
     ctx.restore();
 
@@ -106,7 +106,7 @@ LGraphCanvas.prototype.processMouseDown = function(e) {
     const node = nodes[i]
     const [nL, nT, nW, nH] = node.getBounding()
     const iconX = nL + 4
-    const iconY = nT - 30
+    const iconY = nT - 24
     const iconX1 = nL + 24
     const iconY1 = nT - 12
 
