@@ -112,7 +112,8 @@ LGraphCanvas.prototype.processMouseDown = function(e) {
 
     if(canvasX >= iconX && canvasX <= iconX1 && canvasY >= iconY && canvasY <= iconY1) {
       isClickPaperPlane = true
-      openNodeGithubLink(node);
+      openNodeGithubLink(node); // 阻止默认行为
+      e.stopPropagation(); // 阻止事件冒泡
       break
     }
   }
