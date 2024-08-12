@@ -68,6 +68,8 @@ And in practice, the optimal values of these parameters often need to be determi
 </details> 
 
 # Usage:
+2024-08-12  
+Added ollama related nodes. Some of the code references these authors below, and I would like to make thanks to https://github.com/wujm424606/ComfyUi-Ollama-YN and https://github.com/MinusZoneAI/ComfyUI-Prompt-MZ.
 2024-08-04  
 Add gemma2 related node, please manually download the model to ComfyUI/models/LLavacheckpoints/gemma-2-2b-it, model address https://huggingface.co/google/gemma-2-2b-it/tree/main
 2024-08-02
