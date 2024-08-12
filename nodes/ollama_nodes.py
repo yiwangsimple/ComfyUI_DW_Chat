@@ -5,8 +5,7 @@ import asyncio
 from PIL import Image
 import base64
 from io import BytesIO
-import json
-import re
+
 
 base_url = "http://localhost:11434"
 
@@ -42,6 +41,8 @@ class OllamaImageToText:
                 }),
                 "model": (s.available_models,) if s.available_models else (["No models found"],),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),  # 添加 top_k 参数
+                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),  # 添加 max_tokens 参数
                 "keep_alive": (["0", "60m"],),
                 
             },
@@ -52,7 +53,7 @@ class OllamaImageToText:
     FUNCTION = "ollama_image_to_text"
     CATEGORY = "🌙DW/ImageToText"
 
-    def ollama_image_to_text(self, images, query, seed, model, keep_alive):
+    def ollama_image_to_text(self, images, query, seed, model, top_k, max_tokens, keep_alive):
         images_b64 = []
 
         for image in images:
@@ -66,6 +67,8 @@ class OllamaImageToText:
         client = Client(host=self.base_url)
         options = {
             "seed": seed,
+            "top_k": top_k,  # 添加 top_k 参数
+            "max_tokens": max_tokens,  # 添加 max_tokens 参数
         }
 
         response = client.generate(model=model, prompt=query, keep_alive=keep_alive, options=options, images=images_b64)
@@ -104,7 +107,7 @@ class OllamaTextToText:
                 "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0, "max": 1, "step": 0.05}),
                 "temperature": ("FLOAT", {"default": 0.5, "min": 0, "max": 1, "step": 0.05}),
-                "num_predict": ("FLOAT", {"default": -1, "min": -2, "max": 2048, "step": 1}),
+                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),  # 添加 max_tokens 参数
                 "tfs_z": ("FLOAT", {"default": 1, "min": 1, "max": 1000, "step": 0.05}),
                 "keep_alive": (["0", "60m"],),
             },"optional": {
@@ -117,7 +120,7 @@ class OllamaTextToText:
     FUNCTION = "ollama_text_to_text"
     CATEGORY = "🌙DW/Chat"
 
-    def ollama_text_to_text(self, prompt, model, extra_model, system, seed, top_k, top_p,temperature,num_predict,tfs_z, keep_alive, context=None):
+    def ollama_text_to_text(self, prompt, model, extra_model, system, seed, top_k, top_p,temperature,max_tokens,tfs_z, keep_alive, context=None):
 
         client = Client(host=self.base_url)
 
@@ -126,7 +129,7 @@ class OllamaTextToText:
             "top_k":top_k,
             "top_p":top_p,
             "temperature":temperature,
-            "num_predict":num_predict,
+            "max_tokens":max_tokens,  # 添加 max_tokens 参数
             "tfs_z":tfs_z,
         }
             
