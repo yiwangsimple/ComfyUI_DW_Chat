@@ -21,7 +21,7 @@ class Gemma2PromptNode:
                 "top_p": ("FLOAT", {"default": 0.95, "min": 0.0, "max": 1.0, "step": 0.05}),
                 "device": (["cuda", "cpu"], {"default": "cpu"}),
                 "precision": (["float32", "float16"], {"default": "float32"}),
-                "prompt_type": (["sdxl", "kolors"],),
+                "prompt_type": (["sdxl", "kolors", "flux"],),  # 添加 flux 选项
                 "seed": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
             },
         }
@@ -61,7 +61,7 @@ class Gemma2PromptNode:
    - For character themes, also include "skin spots,acnes,skin blemishes,age spot,mutated hands,mutated fingers,deformed,bad anatomy,disfigured,poorly drawn face,extra limb,ugly,poorly drawn hands,missing limb,floating limbs,disconnected limbs,out of focus,long neck,long body,extra fingers,fewer fingers,,(multi nipples),bad hands,signature,username,bad feet,blurry,bad body"
 
 Generate the prompt directly without any explanations or additional text. Use English only, even if the theme is in Chinese."""
-        else:  # prompt_type == "kolors"
+        elif prompt_type == "kolors":
             system_message = """You are a skilled prompt engineer for the AI art generation model kolors, similar to DALLE-3. You have a deep understanding of prompt complexity to ensure the generated artwork meets user expectations. Your task is to generate high-quality kolors prompts based on the given theme. Please strictly follow these requirements:
 
 1. Output format:
@@ -74,8 +74,27 @@ Generate the prompt directly without any explanations or additional text. Use En
    - Ensure content matches the theme, overall harmony in the image
 
 Generate the prompt directly without any explanations or additional text. Do not include negative prompts."""
+        else:  # prompt_type == "flux"
+            system_message = """You are a professional prompt engineer for the Flux.1 text-to-image large model. Your task is to generate high-quality, detailed English prompts based on the given theme. Please strictly follow these requirements:
 
-        prompt = f"Generate a {'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors'} prompt based on the following theme: {theme}"
+1. Output format:
+   - Output English prompts directly, without any title or prefix
+
+2. Prompt requirements:
+    1. Clear and accurate: Use precise words to describe every aspect of the desired image, avoiding vague or general statements.
+    2. Rich in detail: Provide as many relevant details as possible, including subject appearance, pose, expression, clothing, environment, lighting, etc.
+    3. Style and artistic direction: Clearly specify the desired art style, genre, or medium (e.g., surrealism, watercolor, etc.).
+    4. Color and tone: Describe the expected color scheme, tone (e.g., warm tones), and lighting effects (e.g., soft light).
+    5. Composition and layout: Describe the composition of the image, subject position, perspective, and any specific composition rules.
+    6. Theme and content: Clearly state the core theme and content of the image, including any specific objects, characters, or concepts.
+    7. Detail and texture: Specify any special textures, patterns, or visual details.
+    8. Emotion and atmosphere: Describe the emotion or overall atmosphere the image should convey.
+    9. Contrast and visual effects: Specify any special visual effects or post-processing styles.
+    10. Ensure the output content does not fall below 180 words.
+
+Use fluent, descriptive English to generate the prompt directly, without additional explanations. Ensure the prompt is comprehensive and expressive to fully utilize the capabilities of the Flux.1 model."""
+
+        prompt = f"Generate a {'Stable Diffusion' if prompt_type == 'sdxl' else 'kolors' if prompt_type == 'kolors' else 'Flux.1'} prompt based on the following theme: {theme}"
 
         full_prompt = f"<start_of_turn>user\n{system_message}\n\n{prompt}\n<end_of_turn>\n<start_of_turn>model\n"
         
@@ -107,9 +126,12 @@ Generate the prompt directly without any explanations or additional text. Do not
             else:
                 positive_prompt = response
                 negative_prompt = ""
-        else:  # prompt_type == "kolors"
+        elif prompt_type == "kolors":
             positive_prompt = response.strip()
             negative_prompt = "低质量，坏手，水印"
+        else:  # prompt_type == "flux"
+            positive_prompt = response.strip()
+            negative_prompt = "low quality, bad hands, watermark, blurry, distorted, deformed, disfigured, mutated, unnatural, artificial, fake, inaccurate, inconsistent, out of focus, poorly rendered, amateur, amateurish"
 
         del input_ids, outputs
         torch.cuda.empty_cache() if self.device == "cuda" else None
