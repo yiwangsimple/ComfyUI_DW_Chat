@@ -1,7 +1,8 @@
 import random
 import requests
 import asyncio
-
+import numpy as np
+from ollama import Client
 from PIL import Image
 import base64
 from io import BytesIO
