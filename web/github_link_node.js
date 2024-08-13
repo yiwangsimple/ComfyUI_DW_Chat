@@ -14,26 +14,29 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
   const r = orig?.apply?.(node, restArgs);
 
   if (!node.flags.collapsed && node.constructor.title_mode != LiteGraph.NO_TITLE) {
-    // Draw paper plane icon
-    const paperPlaneIcon = '✈️';
-    let fgColor = "white";
+    // Check if the paper plane icon should be displayed
+    if (app.ui.settings.getSettingValue("Leo.NodeGithubLink.ShowIcon", true)) {
+      // Draw paper plane icon
+      const paperPlaneIcon = '✈️';
+      let fgColor = "white";
 
-    ctx.save();
-    ctx.font = "16px sans-serif";
-    const sz = ctx.measureText(paperPlaneIcon);
-    ctx.beginPath();
-    ctx.fillStyle = fgColor;
-    const x = 4; // Left position
-    const y = -34; // Top position
-    ctx.fillText(paperPlaneIcon, x, y);
-    ctx.restore();
+      ctx.save();
+      ctx.font = "16px sans-serif";
+      const sz = ctx.measureText(paperPlaneIcon);
+      ctx.beginPath();
+      ctx.fillStyle = fgColor;
+      const x = 4; // Left position
+      const y = -34; // Top position
+      ctx.fillText(paperPlaneIcon, x, y);
+      ctx.restore();
 
-    const boundary = node.getBounding();
-    const [ x1, y1, width, height ] = boundary
-    cacheNodePositonMap.set(node.id, {
-      x: [x1 + x, x1 + x + sz.width],
-      y: [y1 , y1 + 18]
-    })
+      const boundary = node.getBounding();
+      const [ x1, y1, width, height ] = boundary
+      cacheNodePositonMap.set(node.id, {
+        x: [x1 + x, x1 + x + sz.width],
+        y: [y1 , y1 + 18]
+      })
+    }
 
     if (node.has_errors) {
       ctx.save();
@@ -112,8 +115,8 @@ LGraphCanvas.prototype.processMouseDown = function(e) {
 
     if(canvasX >= iconX && canvasX <= iconX1 && canvasY >= iconY && canvasY <= iconY1) {
       isClickPaperPlane = true
-      openNodeGithubLink(node); // 阻止默认行为
-      e.stopPropagation(); // 阻止事件冒泡
+      openNodeGithubLink(node);
+      e.stopPropagation();
       break
     }
   }
@@ -142,6 +145,18 @@ app.registerExtension({
         console.log(`URL: ${url}`);
         console.log('---');
       });
+
+      // Add setting for showing/hiding the paper plane icon
+      app.ui.settings.addSetting({
+        id: "Leo.NodeGithubLink.ShowIcon",
+        name: "Show GitHub Link Icon",
+        type: "boolean",
+        defaultValue: true,
+        onChange: (value) => {
+          // Trigger a redraw of all nodes when the setting changes
+          app.graph.setDirtyCanvas(true, true);
+        }
+      });
     } catch (error) {
       console.error('Error loading GitHub links:', error);
     }
@@ -167,10 +182,12 @@ app.registerExtension({
         const iconX1 = nLeft + 24
         const iconY1 = nTop - 12
         if(canvasX >= iconX && canvasX <= iconX1 && canvasY >= iconY && canvasY <= iconY1) {
-          openNodeGithubLink(node);
-          e.preventDefault()
-          e.stopPropagation()
-          return false
+          if (app.ui.settings.getSettingValue("Leo.NodeGithubLink.ShowIcon", true)) {
+            openNodeGithubLink(node);
+            e.preventDefault()
+            e.stopPropagation()
+            return false
+          }
         }
       }
     }
