@@ -38,7 +38,7 @@ class OllamaImageToText:
                 "images": ("IMAGE",),
                 "query": ("STRING", {
                     "multiline": True,
-                    "default": "describe the image"
+                    "default": "Describe the main content of the picture under the speed，Do not generate any descriptive text."
                 }),
                 "model": (s.available_models,) if s.available_models else (["No models found"],),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
