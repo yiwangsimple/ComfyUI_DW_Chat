@@ -15,7 +15,7 @@ function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
 
         if (isLastNode && totalTime !== undefined) {
             text = `Total: ${formatExecutionTime(totalTime)}`;
-            bgColor = "#ff0000"; // 高亮的红色
+            bgColor = "#EF596E"; // 高亮的红色
         } else if (node.ty_et_execution_time !== undefined) {
             text = formatExecutionTime(node.ty_et_execution_time); // 直接显示时间值
             bgColor = "#29b560"; // 执行完成后为绿色
