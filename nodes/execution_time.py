@@ -28,18 +28,31 @@ class ExecutionTime:
     def process(self):
         return ()
 
-origin_recursive_execute = execution.recursive_execute
+# 假设 `execute` 是 `execution` 模块中存在的一个方法，可以替代 `recursive_execute`
+origin_execute = execution.execute
 
 @time_execution
-def timed_recursive_execute(*args, **kwargs):
-    return origin_recursive_execute(*args, **kwargs)
+def timed_execute(*args, **kwargs):
+    return origin_execute(*args, **kwargs)
 
-def swizzle_origin_recursive_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage):
+def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage):
     unique_id = current_item
-    class_type = prompt[unique_id]['class_type']
+
+    # 打印 prompt 对象的类型和所有属性、方法
+    print(f"DynamicPrompt type: {type(prompt)}")
+    print(f"DynamicPrompt dir: {dir(prompt)}")
+
+    # 尝试访问 class_type（需要根据实际情况调整）
+    try:
+        class_type = "Unknown"  # 默认值
+       
+    except AttributeError as e:
+        print(f"Error: Failed to access class_type for unique_id {unique_id}: {e}")
+        return None
+
     last_node_id = server.last_node_id
     
-    result, execution_time = timed_recursive_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage)
+    result, execution_time = timed_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage)
     
     if server.client_id is not None and last_node_id != server.last_node_id:
         server.send_sync(
@@ -51,7 +64,9 @@ def swizzle_origin_recursive_execute(server, prompt, outputs, current_item, extr
     
     return result
 
-execution.recursive_execute = swizzle_origin_recursive_execute
+
+
+execution.execute = swizzle_origin_execute
 
 origin_func = server.PromptServer.send_sync
 
