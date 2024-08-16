@@ -15,7 +15,7 @@ function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
 
         if (isLastNode && totalTime !== undefined) {
             text = `Total: ${formatExecutionTime(totalTime)}`;
-            bgColor = "#EF596E"; // 高亮的红色
+            bgColor = "#ff0000"; // 高亮的红色
         } else if (node.ty_et_execution_time !== undefined) {
             text = formatExecutionTime(node.ty_et_execution_time); // 直接显示时间值
             bgColor = "#29b560"; // 执行完成后为绿色
@@ -28,10 +28,14 @@ function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
         ctx.save();
         ctx.font = "12px sans-serif";
         const textSize = ctx.measureText(text);
+        const paddingHorizontal = 6;
+        const badgeWidth = textSize.width + paddingHorizontal * 2;
+        const badgeHeight = 20;
+
+        ctx.clearRect(0, -LiteGraph.NODE_TITLE_HEIGHT - badgeHeight, badgeWidth, badgeHeight); // 清除当前节点的绘制内容
         ctx.fillStyle = bgColor;
         ctx.beginPath();
-        const paddingHorizontal = 6;
-        ctx.roundRect(0, -LiteGraph.NODE_TITLE_HEIGHT - 20, textSize.width + paddingHorizontal * 2, 20, 5);
+        ctx.roundRect(0, -LiteGraph.NODE_TITLE_HEIGHT - badgeHeight, badgeWidth, badgeHeight, 5);
         ctx.fill();
 
         ctx.fillStyle = "white";
