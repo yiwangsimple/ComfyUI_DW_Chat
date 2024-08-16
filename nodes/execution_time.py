@@ -21,12 +21,18 @@ class ExecutionTime:
     def INPUT_TYPES(s):
         return {"required": {}}
 
-    RETURN_TYPES = ()
-    RETURN_NAMES = ()
+    RETURN_TYPES = ("STRING",)  # 添加字符串输出接口
+    RETURN_NAMES = ("execution_time",)
     FUNCTION = "process"
 
     def process(self):
-        return ()
+        return ("",)  # 返回空字符串，实际的总执行时间将在 swizzle_send_sync 中设置
+
+    @staticmethod
+    def display_total_execution_time(total_time):
+        formatted_time = f"{total_time:.2f}s"
+        print(f"Total Execution Time: {formatted_time}")
+        return formatted_time
 
 # 假设 `execute` 是 `execution` 模块中存在的一个方法，可以替代 `recursive_execute`
 origin_execute = execution.execute
@@ -37,10 +43,6 @@ def timed_execute(*args, **kwargs):
 
 def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage):
     unique_id = current_item
-
-    # 打印 prompt 对象的类型和所有属性、方法
-    print(f"DynamicPrompt type: {type(prompt)}")
-    print(f"DynamicPrompt dir: {dir(prompt)}")
 
     # 尝试访问 class_type（需要根据实际情况调整）
     try:
@@ -64,8 +66,6 @@ def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, ex
     
     return result
 
-
-
 execution.execute = swizzle_origin_execute
 
 origin_func = server.PromptServer.send_sync
@@ -76,15 +76,21 @@ def swizzle_send_sync(self, event, data, sid=None):
 
     origin_func(self, event=event, data=data, sid=sid)
 
-    if event == "executing" and data and data.get("node") is None and sid is not None:
+    if event == "execution_complete" and sid is not None:
         execution_time = time.perf_counter() - self.execution_start_time
         new_data = data.copy()
-        new_data['execution_time'] = int(execution_time * 1000)
+        new_data['total_execution_time'] = int(execution_time * 1000)
         origin_func(
             self,
-            event="TyDev-Utils.ExecutionTime.execution_end",
+            event="TyDev-Utils.ExecutionTime.execution_complete",
             data=new_data,
             sid=sid
+        )
+        formatted_time = ExecutionTime.display_total_execution_time(execution_time)
+        server.send_sync(
+            "TyDev-Utils.ExecutionTime.total_time",
+            {"total_execution_time": formatted_time},
+            sid
         )
 
 server.PromptServer.send_sync = swizzle_send_sync
