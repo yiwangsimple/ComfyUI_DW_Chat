@@ -5,7 +5,7 @@ function formatExecutionTime(time) {
     return `${(time / 1000.0).toFixed(2)}s`;
 }
 
-function drawBadge(node, orig, restArgs) {
+function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
     let ctx = restArgs[0];
     const r = orig?.apply?.(node, restArgs);
 
@@ -13,12 +13,11 @@ function drawBadge(node, orig, restArgs) {
         let text = "";
         let bgColor = "#ffa500"; // 正在执行时为橙色
 
-        if (node.ty_et_start_time !== undefined) {
-            const currentTime = performance.now();
-            const elapsedTime = currentTime - node.ty_et_start_time;
-            text = formatExecutionTime(elapsedTime);
+        if (isLastNode && totalTime !== undefined) {
+            text = `Total: ${formatExecutionTime(totalTime)}`;
+            bgColor = "#EF596E"; // 高亮的红色
         } else if (node.ty_et_execution_time !== undefined) {
-            text = formatExecutionTime(node.ty_et_execution_time);
+            text = `Node: ${formatExecutionTime(node.ty_et_execution_time)}`;
             bgColor = "#29b560"; // 执行完成后为绿色
         }
 
@@ -43,6 +42,9 @@ function drawBadge(node, orig, restArgs) {
 }
 
 let updateInterval;
+let totalExecutionStartTime;
+let totalExecutionEndTime;
+let lastExecutedNode;
 
 function startUpdateInterval() {
     if (!updateInterval) {
@@ -75,6 +77,11 @@ app.registerExtension({
                 stopUpdateInterval();
                 return;
             }
+
+            if (!totalExecutionStartTime) {
+                totalExecutionStartTime = performance.now();  // 记录流程开始时间
+            }
+
             const node = app.graph.getNodeById(nodeId);
             if (node) {
                 node.ty_et_start_time = performance.now();
@@ -85,6 +92,7 @@ app.registerExtension({
 
         api.addEventListener("executed", () => {
             stopUpdateInterval();
+            totalExecutionEndTime = performance.now();  // 记录流程结束时间
         });
 
         api.addEventListener("TyDev-Utils.ExecutionTime.executed", ({ detail }) => {
@@ -92,6 +100,7 @@ app.registerExtension({
             if (node) {
                 node.ty_et_execution_time = detail.execution_time;
                 node.ty_et_start_time = undefined;
+                lastExecutedNode = node; // 记录最后一个执行的节点
                 app.graph.setDirtyCanvas(true, false);
             }
         });
@@ -104,8 +113,12 @@ app.registerExtension({
             }
 
             node.onDrawForeground = function (ctx) {
+                let totalTime;
+                if (totalExecutionStartTime && totalExecutionEndTime) {
+                    totalTime = totalExecutionEndTime - totalExecutionStartTime;
+                }
                 if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
-                    drawBadge(node, orig, arguments);
+                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
                 } else {
                     orig?.apply?.(node, arguments);
                 }
@@ -117,8 +130,12 @@ app.registerExtension({
         if (!node.ty_et_swizzled) {
             const orig = node.onDrawForeground;
             node.onDrawForeground = function (ctx) {
+                let totalTime;
+                if (totalExecutionStartTime && totalExecutionEndTime) {
+                    totalTime = totalExecutionEndTime - totalExecutionStartTime;
+                }
                 if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
-                    drawBadge(node, orig, arguments);
+                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
                 } else {
                     orig?.apply?.(node, arguments);
                 }
