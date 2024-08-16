@@ -15,7 +15,7 @@ def time_execution(func):
     return wrapper
 
 class ExecutionTime:
-    CATEGORY = "TyDev-Utils/Debug"
+    CATEGORY = "DW-Utils/Debug"
 
     @classmethod
     def INPUT_TYPES(s):
@@ -58,7 +58,7 @@ def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, ex
     
     if server.client_id is not None and last_node_id != server.last_node_id:
         server.send_sync(
-            "TyDev-Utils.ExecutionTime.executed",
+            "DW-Utils.ExecutionTime.executed",
             {"node": unique_id, "prompt_id": prompt_id, "execution_time": int(execution_time * 1000)},
             server.client_id
         )
@@ -82,13 +82,13 @@ def swizzle_send_sync(self, event, data, sid=None):
         new_data['total_execution_time'] = int(execution_time * 1000)
         origin_func(
             self,
-            event="TyDev-Utils.ExecutionTime.execution_complete",
+            event="DW-Utils.ExecutionTime.execution_complete",
             data=new_data,
             sid=sid
         )
         formatted_time = ExecutionTime.display_total_execution_time(execution_time)
         server.send_sync(
-            "TyDev-Utils.ExecutionTime.total_time",
+            "DW-Utils.ExecutionTime.total_time",
             {"total_execution_time": formatted_time},
             sid
         )
