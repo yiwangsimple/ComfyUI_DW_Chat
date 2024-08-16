@@ -66,10 +66,10 @@ function stopUpdateInterval() {
 }
 
 app.registerExtension({
-    name: "TyDev-Utils.ExecutionTime",
+    name: "DW-Utils.ExecutionTime",
     async setup() {
         app.ui.settings.addSetting({
-            id: "TyDev.ExecutionTime.Enabled",
+            id: "DW.ExecutionTime.Enabled",
             name: "Show Execution Time",
             type: "boolean",
             defaultValue: true,
@@ -99,7 +99,7 @@ app.registerExtension({
             totalExecutionEndTime = performance.now();  // 记录流程结束时间
         });
 
-        api.addEventListener("TyDev-Utils.ExecutionTime.executed", ({ detail }) => {
+        api.addEventListener("DW-Utils.ExecutionTime.executed", ({ detail }) => {
             const node = app.graph.getNodeById(detail.node);
             if (node) {
                 node.ty_et_execution_time = detail.execution_time;
@@ -121,7 +121,7 @@ app.registerExtension({
                 if (totalExecutionStartTime && totalExecutionEndTime) {
                     totalTime = totalExecutionEndTime - totalExecutionStartTime;
                 }
-                if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
+                if (app.ui.settings.getSettingValue("DW.ExecutionTime.Enabled", true)) {
                     drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
                 } else {
                     orig?.apply?.(node, arguments);
@@ -138,7 +138,7 @@ app.registerExtension({
                 if (totalExecutionStartTime && totalExecutionEndTime) {
                     totalTime = totalExecutionEndTime - totalExecutionStartTime;
                 }
-                if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
+                if (app.ui.settings.getSettingValue("DW.ExecutionTime.Enabled", true)) {
                     drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
                 } else {
                     orig?.apply?.(node, arguments);

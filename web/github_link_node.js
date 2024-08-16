@@ -15,7 +15,7 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
 
   if (!node.flags.collapsed && node.constructor.title_mode != LiteGraph.NO_TITLE) {
     // Check if the paper plane icon should be displayed
-    if (app.ui.settings.getSettingValue("Leo.NodeGithubLink.ShowIcon", true)) {
+    if (app.ui.settings.getSettingValue("DW.NodeGithubLink.ShowIcon", true)) {
       // Draw paper plane icon
       const paperPlaneIcon = '⭐️';
       let fgColor = "white";
@@ -48,7 +48,7 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
     }
 
     // Draw execution time
-    if (app.ui.settings.getSettingValue("TyDev.ExecutionTime.Enabled", true)) {
+    if (app.ui.settings.getSettingValue("DW.ExecutionTime.Enabled", true)) {
       let text = "";
       let bgColor = "#ffa500"; // Orange for ongoing execution
 
@@ -128,7 +128,7 @@ LGraphCanvas.prototype.processMouseDown = function(e) {
 
 // 注册前端插件
 app.registerExtension({
-  name: 'Leo.NodeGithubLink',
+  name: 'DW.NodeGithubLink',
   async setup() {
     try {
       const response = await fetch('/github_btn/get_github_links');
@@ -148,7 +148,7 @@ app.registerExtension({
 
       // Add setting for showing/hiding the paper plane icon
       app.ui.settings.addSetting({
-        id: "Leo.NodeGithubLink.ShowIcon",
+        id: "DW.NodeGithubLink.ShowIcon",
         name: "Show GitHub Link Icon",
         type: "boolean",
         defaultValue: true,
@@ -182,7 +182,7 @@ app.registerExtension({
         const iconX1 = nLeft + 24
         const iconY1 = nTop - 12
         if(canvasX >= iconX && canvasX <= iconX1 && canvasY >= iconY && canvasY <= iconY1) {
-          if (app.ui.settings.getSettingValue("Leo.NodeGithubLink.ShowIcon", true)) {
+          if (app.ui.settings.getSettingValue("DW.NodeGithubLink.ShowIcon", true)) {
             openNodeGithubLink(node);
             e.preventDefault()
             e.stopPropagation()
