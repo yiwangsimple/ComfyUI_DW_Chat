@@ -17,7 +17,7 @@ const drawPaperPlaneIcon = function(node, orig, restArgs) {
     // Check if the paper plane icon should be displayed
     if (app.ui.settings.getSettingValue("Leo.NodeGithubLink.ShowIcon", true)) {
       // Draw paper plane icon
-      const paperPlaneIcon = '✈️';
+      const paperPlaneIcon = '⭐️';
       let fgColor = "white";
 
       ctx.save();
