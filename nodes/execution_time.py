@@ -15,7 +15,7 @@ def time_execution(func):
     return wrapper
 
 class ExecutionTime:
-    CATEGORY = "DW-Utils/Debug"
+    CATEGORY = "utils"
 
     @classmethod
     def INPUT_TYPES(s):
