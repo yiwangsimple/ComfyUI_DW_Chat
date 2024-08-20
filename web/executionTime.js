@@ -5,6 +5,10 @@ function formatExecutionTime(time) {
     return `${(time / 1000.0).toFixed(2)}s`;
 }
 
+function getNodeName(node) {
+    return node.displayName || node.name || node.title || node.type || node.constructor.name || "Unknown";
+}
+
 function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
     let ctx = restArgs[0];
     const r = orig?.apply?.(node, restArgs);
@@ -49,6 +53,18 @@ let updateInterval;
 let totalExecutionStartTime;
 let totalExecutionEndTime;
 let lastExecutedNode;
+let isExecuting = false;
+
+function resetExecutionTimes() {
+    totalExecutionStartTime = null;
+    totalExecutionEndTime = null;
+    lastExecutedNode = null;
+    // 重置所有节点的执行时间
+    app.graph._nodes.forEach(node => {
+        node.ty_et_execution_time = undefined;
+        node.ty_et_start_time = undefined;
+    });
+}
 
 function startUpdateInterval() {
     if (!updateInterval) {
@@ -78,25 +94,42 @@ app.registerExtension({
         api.addEventListener("executing", ({ detail }) => {
             const nodeId = detail;
             if (!nodeId) {
+                if (isExecuting) {
+                    // 只有当之前正在执行时，才重置执行时间
+                    resetExecutionTimes();
+                }
+                isExecuting = true;
                 stopUpdateInterval();
                 return;
             }
 
             if (!totalExecutionStartTime) {
-                totalExecutionStartTime = performance.now();  // 记录流程开始时间
+                totalExecutionStartTime = performance.now();
             }
 
             const node = app.graph.getNodeById(nodeId);
             if (node) {
                 node.ty_et_start_time = performance.now();
-                node.ty_et_execution_time = undefined;
                 startUpdateInterval();
             }
         });
 
         api.addEventListener("executed", () => {
             stopUpdateInterval();
-            totalExecutionEndTime = performance.now();  // 记录流程结束时间
+            totalExecutionEndTime = performance.now();
+            isExecuting = false;
+
+            // 在执行完成后打印所有节点的执行时间
+            app.graph._nodes.forEach(node => {
+                if (node.ty_et_execution_time !== undefined) {
+                    console.log(`#${node.id} [${getNodeName(node)}]: ${formatExecutionTime(node.ty_et_execution_time)}`);
+                }
+            });
+
+            if (totalExecutionStartTime && totalExecutionEndTime) {
+                const totalTime = totalExecutionEndTime - totalExecutionStartTime;
+                console.log(`Prompt executed in ${formatExecutionTime(totalTime)}`);
+            }
         });
 
         api.addEventListener("DW-Utils.ExecutionTime.executed", ({ detail }) => {
@@ -104,7 +137,7 @@ app.registerExtension({
             if (node) {
                 node.ty_et_execution_time = detail.execution_time;
                 node.ty_et_start_time = undefined;
-                lastExecutedNode = node; // 记录最后一个执行的节点
+                lastExecutedNode = node;
                 app.graph.setDirtyCanvas(true, false);
             }
         });
@@ -122,7 +155,7 @@ app.registerExtension({
                     totalTime = totalExecutionEndTime - totalExecutionStartTime;
                 }
                 if (app.ui.settings.getSettingValue("DW.ExecutionTime.Enabled", true)) {
-                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
+                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode);
                 } else {
                     orig?.apply?.(node, arguments);
                 }
@@ -139,7 +172,7 @@ app.registerExtension({
                     totalTime = totalExecutionEndTime - totalExecutionStartTime;
                 }
                 if (app.ui.settings.getSettingValue("DW.ExecutionTime.Enabled", true)) {
-                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode); // 增加 isLastNode 参数
+                    drawBadge(node, orig, arguments, totalTime, node === lastExecutedNode);
                 } else {
                     orig?.apply?.(node, arguments);
                 }
