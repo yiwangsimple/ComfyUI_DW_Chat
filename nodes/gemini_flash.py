@@ -96,17 +96,18 @@ class Gemini1_5Vision(Gemini1_5Base):
                 "image": ("IMAGE",),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "max_tokens": ("INT", {"default": 1024, "min": 1, "max": 2048}),
-                "use_fixed_seed": ("BOOLEAN", {"default": False}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})
+            },
+            "optional": {
+                "seed": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff})
             }
         }
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("description",)
     FUNCTION = "analyze_image"
-    CATEGORY = "🌙DW/Gemini1.5"
+    CATEGORY = "Gemini1.5"
 
-    def analyze_image(self, prompt, image, temperature, max_tokens, use_fixed_seed, seed):
+    def analyze_image(self, prompt, image, temperature, max_tokens, seed=-1):
         if not self.client:
             return ("错误：GEMINI_API_KEY 未设置或无效。请检查您的 api_key.ini 文件。",)
 
@@ -115,20 +116,17 @@ class Gemini1_5Vision(Gemini1_5Base):
         try:
             pil_image = self.tensor_to_image(image)
             
-            if use_fixed_seed:
+            if seed != -1:
                 random.seed(seed)
                 torch.manual_seed(seed)
             
             with temporary_env_var('HTTP_PROXY', None), temporary_env_var('HTTPS_PROXY', None):
                 textoutput = self.call_api(model, prompt, image=pil_image, temperature=temperature, max_tokens=max_tokens)
             
-            if use_fixed_seed:
-                textoutput = f"[使用固定种子: {seed}]\n\n" + textoutput
-            
             return (textoutput,)
         except Exception as e:
             return (f"错误: {str(e)}",)
-
+        
 NODE_CLASS_MAPPINGS = {
     "Gemini1_5Text": Gemini1_5Text,
     "Gemini1_5Vision": Gemini1_5Vision,
