@@ -69,7 +69,8 @@ And in practice, the optimal values of these parameters often need to be determi
 
 # Usage:
 2024-08-21  
-Three new node types based on gemini 1.5 flashAPI have been added, providing text dialog, cue word backpropagation and flux clip_L and clip_T5 cue word output nodes respectively.
+Three new node types based on gemini 1.5 flashAPI have been added, providing text dialog, cue word backpropagation and flux clip_L and clip_T5 cue word output nodes respectively.  
+![](image/demo12.png) 
 2024-08-12  
 Added ollama related nodes. Some of the code references these authors below, and I would like to make thanks to https://github.com/wujm424606/ComfyUi-Ollama-YN and https://github.com/MinusZoneAI/ComfyUI-Prompt-MZ.
 ![](image/demo11.png) 
