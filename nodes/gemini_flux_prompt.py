@@ -125,7 +125,7 @@ clip-T5: [英文自然语言描述]
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("clip_L", "clip_T5")
     FUNCTION = "generate"
-    CATEGORY = "Gemini"
+    CATEGORY = "🌙DW/Gemini1.5"
 
     def generate(self, text_input, image_input=None):
         return self.generate_prompt(text_input, image_input)
