@@ -105,7 +105,7 @@ class Gemini1_5Vision(Gemini1_5Base):
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("description",)
     FUNCTION = "analyze_image"
-    CATEGORY = "Gemini1.5"
+    CATEGORY = "🌙DW/Gemini1.5"
 
     def analyze_image(self, prompt, image, temperature, max_tokens, seed=-1):
         if not self.client:
