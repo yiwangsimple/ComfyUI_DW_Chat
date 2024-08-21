@@ -96,8 +96,7 @@ class Gemini1_5Vision(Gemini1_5Base):
                 "image": ("IMAGE",),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "max_tokens": ("INT", {"default": 1024, "min": 1, "max": 2048}),
-                "use_fixed_seed": ("BOOLEAN", {"default": False}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff})    
             }
         }
 
