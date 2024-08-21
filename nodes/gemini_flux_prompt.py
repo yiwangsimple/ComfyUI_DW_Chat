@@ -57,7 +57,7 @@ class GeminiFluxPrompt:
         if not self.client:
             return "错误：GEMINI_API_KEY 未设置或无效。请检查您的 api_key.ini 文件。", ""
 
-        model = self.client.GenerativeModel('gemini-1.5-flash')
+        model = self.client.GenerativeModel('gemini-1.5-pro')
 
         system_prompt = """你是一位有艺术气息的Stable Diffusion prompt 助理。你的任务是根据给定的主题生成一份详细的、高质量的prompt，让Stable Diffusion可以生成高质量的图像。prompt必须包含"clip-L:"和"clip-T5:"两部分。请严格按照以下格式输出：
 
