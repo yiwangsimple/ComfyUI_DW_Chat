@@ -23,24 +23,21 @@ from .nodes.deepseek_chat import NODE_CLASS_MAPPINGS as DEEPSEEK_CHAT_CLASS_MAPP
 from .nodes.deepseek_chat import NODE_DISPLAY_NAME_MAPPINGS as DEEPSEEK_CHAT_DISPLAY_MAPPINGS
 from .nodes.error_log import NODE_CLASS_MAPPINGS as ERROR_LOG_CLASS_MAPPINGS
 from .nodes.error_log import NODE_DISPLAY_NAME_MAPPINGS as ERROR_LOG_DISPLAY_MAPPINGS
-
-# 导入执行时间插件
 from .nodes.execution_time import NODE_CLASS_MAPPINGS as EXECUTION_TIME_CLASS_MAPPINGS
 from .nodes.execution_time import NODE_DISPLAY_NAME_MAPPINGS as EXECUTION_TIME_DISPLAY_MAPPINGS
-
-# 导入gemma2相关节点
 from .nodes.gemma_node import NODE_CLASS_MAPPINGS as GEMMA_NODE_CLASS_MAPPINGS
 from .nodes.gemma_node import NODE_DISPLAY_NAME_MAPPINGS as GEMMA_NODE_DISPLAY_MAPPINGS
 from .nodes.gemma2prompt import NODE_CLASS_MAPPINGS as GEMMA2_PROMPT_CLASS_MAPPINGS
 from .nodes.gemma2prompt import NODE_DISPLAY_NAME_MAPPINGS as GEMMA2_PROMPT_DISPLAY_MAPPINGS
-
-# 修改 github_link_node 的导入方式
 from .nodes.github_link_node import NODE_CLASS_MAPPINGS as GITHUB_LINK_NODE_CLASS_MAPPINGS
 from .nodes.github_link_node import NODE_DISPLAY_NAME_MAPPINGS as GITHUB_LINK_NODE_DISPLAY_MAPPINGS
 from .nodes.github_link_node import WEB_DIRECTORY, initialize_github_links
-
 from .nodes.ollama_nodes import NODE_CLASS_MAPPINGS as OLLAMA_CLASS_MAPPINGS
 from .nodes.ollama_nodes import NODE_DISPLAY_NAME_MAPPINGS as OLLAMA_DISPLAY_MAPPINGS
+
+# 导入新的 Gemini 1.5 Flash 节点
+from .nodes.gemini_flash import NODE_CLASS_MAPPINGS as GEMINI_FLASH_CLASS_MAPPINGS
+from .nodes.gemini_flash import NODE_DISPLAY_NAME_MAPPINGS as GEMINI_FLASH_DISPLAY_MAPPINGS
 
 # 调用初始化函数
 initialize_github_links()
@@ -73,7 +70,8 @@ NODE_CLASS_MAPPINGS = {
     **GEMMA2_PROMPT_CLASS_MAPPINGS,
     **GEMMA_NODE_CLASS_MAPPINGS,
     **GITHUB_LINK_NODE_CLASS_MAPPINGS,
-    **OLLAMA_CLASS_MAPPINGS  # 添加 Ollama 节点
+    **OLLAMA_CLASS_MAPPINGS,
+    **GEMINI_FLASH_CLASS_MAPPINGS  # 添加 Gemini 1.5 Flash 节点
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -92,7 +90,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **GEMMA2_PROMPT_DISPLAY_MAPPINGS,
     **GEMMA_NODE_DISPLAY_MAPPINGS,
     **GITHUB_LINK_NODE_DISPLAY_MAPPINGS,
-    **OLLAMA_DISPLAY_MAPPINGS  # 添加 Ollama 节点
+    **OLLAMA_DISPLAY_MAPPINGS,
+    **GEMINI_FLASH_DISPLAY_MAPPINGS  # 添加 Gemini 1.5 Flash 节点
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "load_api_key"]
