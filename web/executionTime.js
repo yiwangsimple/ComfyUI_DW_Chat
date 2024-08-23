@@ -36,7 +36,8 @@ function drawBadge(node, orig, restArgs, totalTime, isLastNode) {
         const badgeWidth = textSize.width + paddingHorizontal * 2;
         const badgeHeight = 20;
 
-        ctx.clearRect(0, -LiteGraph.NODE_TITLE_HEIGHT - badgeHeight, badgeWidth, badgeHeight); // 清除当前节点的绘制内容
+        // 清除当前节点的绘制内容
+        ctx.clearRect(0, -LiteGraph.NODE_TITLE_HEIGHT - badgeHeight, badgeWidth, badgeHeight);
         ctx.fillStyle = bgColor;
         ctx.beginPath();
         ctx.roundRect(0, -LiteGraph.NODE_TITLE_HEIGHT - badgeHeight, badgeWidth, badgeHeight, 5);
@@ -109,6 +110,8 @@ app.registerExtension({
 
             const node = app.graph.getNodeById(nodeId);
             if (node) {
+                // 重置节点的执行时间
+                node.ty_et_execution_time = undefined;
                 node.ty_et_start_time = performance.now();
                 startUpdateInterval();
             }
@@ -129,6 +132,11 @@ app.registerExtension({
             if (totalExecutionStartTime && totalExecutionEndTime) {
                 const totalTime = totalExecutionEndTime - totalExecutionStartTime;
                 console.log(`Prompt executed in ${formatExecutionTime(totalTime)}`);
+                // 更新最后一个节点的执行时间
+                if (lastExecutedNode) {
+                    lastExecutedNode.ty_et_execution_time = totalTime;
+                    app.graph.setDirtyCanvas(true, false);
+                }
             }
         });
 
