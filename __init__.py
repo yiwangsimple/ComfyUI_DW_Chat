@@ -81,7 +81,7 @@ NODE_CLASS_MAPPINGS = {
     **OLLAMA_CLASS_MAPPINGS,
     **GEMINI_FLASH_CLASS_MAPPINGS,  # 添加 Gemini 1.5 Flash 节点
     **GEMINI_FLUX_PROMPT_CLASS_MAPPINGS,  # 添加 GeminiFluxPrompt 节点
-    **PALI_GEMMA_3B_CAPTIONER_CLASS_MAPPINGS,  # 添加 PaliGemma3bCaptioner 节点
+    **PALI_GEMMA_3B_CAPTIONER_CLASS_MAPPINGS,   # 添加 PaliGemma3bCaptioner 节点
     
 }
 
