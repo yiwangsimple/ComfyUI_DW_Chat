@@ -43,6 +43,10 @@ from .nodes.gemini_flash import NODE_DISPLAY_NAME_MAPPINGS as GEMINI_FLASH_DISPL
 from .nodes.gemini_flux_prompt import NODE_CLASS_MAPPINGS as GEMINI_FLUX_PROMPT_CLASS_MAPPINGS
 from .nodes.gemini_flux_prompt import NODE_DISPLAY_NAME_MAPPINGS as GEMINI_FLUX_PROMPT_DISPLAY_MAPPINGS
 
+# 导入新的 PaliGemma3bCaptioner 节点
+from .nodes.PaliGemma3bCaptioner import NODE_CLASS_MAPPINGS as PALI_GEMMA_3B_CAPTIONER_CLASS_MAPPINGS
+from .nodes.PaliGemma3bCaptioner import NODE_DISPLAY_NAME_MAPPINGS as PALI_GEMMA_3B_CAPTIONER_DISPLAY_MAPPINGS
+
 # 调用初始化函数
 initialize_github_links()
 
@@ -76,7 +80,9 @@ NODE_CLASS_MAPPINGS = {
     **GITHUB_LINK_NODE_CLASS_MAPPINGS,
     **OLLAMA_CLASS_MAPPINGS,
     **GEMINI_FLASH_CLASS_MAPPINGS,  # 添加 Gemini 1.5 Flash 节点
-    **GEMINI_FLUX_PROMPT_CLASS_MAPPINGS  # 添加 GeminiFluxPrompt 节点
+    **GEMINI_FLUX_PROMPT_CLASS_MAPPINGS,  # 添加 GeminiFluxPrompt 节点
+    **PALI_GEMMA_3B_CAPTIONER_CLASS_MAPPINGS,  # 添加 PaliGemma3bCaptioner 节点
+    
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -97,7 +103,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **GITHUB_LINK_NODE_DISPLAY_MAPPINGS,
     **OLLAMA_DISPLAY_MAPPINGS,
     **GEMINI_FLASH_DISPLAY_MAPPINGS,  # 添加 Gemini 1.5 Flash 节点
-    **GEMINI_FLUX_PROMPT_DISPLAY_MAPPINGS  # 添加 GeminiFluxPrompt 节点
+    **GEMINI_FLUX_PROMPT_DISPLAY_MAPPINGS,  # 添加 GeminiFluxPrompt 节点
+    **PALI_GEMMA_3B_CAPTIONER_DISPLAY_MAPPINGS,  # 添加 PaliGemma3bCaptioner 节点
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "load_api_key"]
