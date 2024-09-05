@@ -89,7 +89,7 @@ class Qwen2VLCaption(QwenVLBase):
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("result",)
     FUNCTION = "process_image"
-    CATEGORY = "🌙DW/QwenVL"
+    CATEGORY = "🌙DW/Qwen2VL"
 
     def process_image(self, image, prompt, model, task, temperature, max_tokens):
         if not self.api_key:
@@ -120,5 +120,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Qwen2VLCaption": "通义千问VL 多功能视觉分析",
+    "Qwen2VLCaption": "通义千问VL API多功能视觉分析",
 }
