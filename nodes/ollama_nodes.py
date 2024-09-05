@@ -44,7 +44,7 @@ class OllamaImageToText:
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),  # 添加 top_k 参数
                 "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),  # 添加 max_tokens 参数
-                "keep_alive": (["0", "60m"],),
+                "keep_alive": ("BOOLEAN", {"default": False}),
                 
             },
         }
