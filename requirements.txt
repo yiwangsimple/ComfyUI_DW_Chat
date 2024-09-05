@@ -7,3 +7,4 @@ openai>=1.0
 httpx
 langdetect
 tenacity
+dashscope
