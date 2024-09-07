@@ -1,12 +1,12 @@
 import os
-from pathlib import Path
 import torch
+import numpy as np
 from PIL import Image
-from torchvision.transforms import ToPILImage
 from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
 import folder_paths
 import gc
-import platform
+from qwen_vl_utils import process_vision_info
+import cv2
 
 class Qwen2VLLocalCaption:
     def __init__(self):
@@ -44,8 +44,35 @@ class Qwen2VLLocalCaption:
                 self.precision = precision
                 self.load_model()
 
-            pil_image = ToPILImage()(image.squeeze().cpu())
+            print(f"Input image type: {type(image)}")
+            if isinstance(image, torch.Tensor):
+                print(f"Image tensor shape: {image.shape}")
+                
+                # 处理特殊的图像形状
+                if image.shape == (1, 1, 1152):
+                    # 假设这是一个被错误解释的 RGB 图像
+                    image = image.squeeze().reshape(16, 24, 3)  # 16 * 24 * 3 = 1152
+                elif image.shape[0] == 1:
+                    image = image.squeeze(0)
+                
+                # 确保图像是 3 通道的
+                if image.shape[2] != 3:
+                    if image.shape[2] == 1:
+                        image = image.repeat(1, 1, 3)
+                    else:
+                        raise ValueError(f"Unexpected number of channels: {image.shape[2]}")
+                
+                # 转换为 numpy 数组
+                image = (image.cpu().numpy() * 255).astype(np.uint8)
+                
+                # 调整图像大小为模型期望的尺寸（假设为224x224）
+                image = cv2.resize(image, (224, 224))
+                
+                # 转换为 PIL Image
+                image = Image.fromarray(image)
             
+            print(f"Processed image size: {image.size}, mode: {image.mode}")
+
             task_prompts = {
                 "general": "分析这张图片并提供详细描述。",
                 "ocr": "识别并提取图片中的所有文字。",
@@ -60,26 +87,33 @@ class Qwen2VLLocalCaption:
                 {
                     "role": "user",
                     "content": [
-                        {"image": pil_image},
-                        {"text": full_prompt}
+                        {"type": "image", "image": image},
+                        {"type": "text", "text": full_prompt}
                     ]
                 }
             ]
 
             text = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-            inputs = self.processor(text=[text], images=[pil_image], return_tensors="pt").to(self.device)
+            image_inputs, _ = process_vision_info(messages)
+            inputs = self.processor(text=[text], images=image_inputs, return_tensors="pt").to(self.device)
 
             with torch.no_grad():
                 generated_ids = self.model.generate(**inputs, max_new_tokens=max_tokens, temperature=temperature, do_sample=True)
             generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
             
+            # 提取助手的回答
+            assistant_response = generated_text.split('assistant\n')[-1].strip()
+            
             del inputs, generated_ids
             torch.cuda.empty_cache() if self.device == "cuda" else None
             gc.collect()
             
-            return (generated_text,)
+            return (assistant_response,)
         except Exception as e:
-            return (f"错误: {str(e)}",)
+            import traceback
+            error_msg = f"错误: {str(e)}\n{traceback.format_exc()}"
+            print(error_msg)
+            return (error_msg,)
 
     def load_model(self):
         if self.model_path is None or not os.path.exists(self.model_path):
@@ -100,37 +134,20 @@ class Qwen2VLLocalCaption:
             
         except Exception as e:
             print(f"Error loading model: {e}")
-            # 尝试列出模型目录的内容
-            try:
-                print(f"Contents of model directory:")
-                for item in os.listdir(self.model_path):
-                    print(f"  - {item}")
-            except Exception as dir_error:
-                print(f"Error listing model directory: {dir_error}")
             raise RuntimeError(f"Failed to load the model from {self.model_path}. Error: {str(e)}")
 
     def get_model_path(self):
         possible_paths = [
-            Path(folder_paths.models_dir) / "prompt_generator" / "Qwen2-VL-2B-Instruct",
-            Path("models/prompt_generator/Qwen2-VL-2B-Instruct"),
-            Path("Qwen2-VL-2B-Instruct"),
+            os.path.join(folder_paths.models_dir, "prompt_generator", "Qwen2-VL-2B-Instruct"),
+            "models/prompt_generator/Qwen2-VL-2B-Instruct",
+            "Qwen2-VL-2B-Instruct",
         ]
         
         for path in possible_paths:
-            print(f"Checking path: {path}")
-            if path.exists():
-                print(f"Path exists: {path}")
-                if any(path.iterdir()):
-                    print(f"Path contains files: {path}")
-                    print(f"Files in directory: {list(path.iterdir())}")
-                    return str(path)
-                else:
-                    print(f"Path is empty: {path}")
-            else:
-                print(f"Path does not exist: {path}")
+            if os.path.exists(path) and any(os.scandir(path)):
+                return path
         
-        print("Could not find the Qwen2-VL model in any of the expected directories.")
-        return None
+        raise RuntimeError("Could not find the Qwen2-VL model. Please ensure it's placed in one of the expected directories.")
 
     def unload_model(self):
         del self.model
