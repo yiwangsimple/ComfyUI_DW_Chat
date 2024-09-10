@@ -1,4 +1,4 @@
-# comfy-groqchat
+# comfy-dw-chat
 The dialogue functionality of the current node is based on the Groq API (https://console.groq.com/keys), kimi API (https://platform.moonshot.cn/console/api-keys), and deepseek API (https://platform.deepseek.com/api_keys). Please obtain the necessary API keys from the respective websites and place them in the api_key.ini file. Through API calls, single-turn or multi-turn chats can be achieved to generate positive and negative prompts and error guides. Additionally, the node integrates image inversion nodes based on the moondream2 and PaliGemma large models.
 <details>
 What the parameters presence_penalty and frequency_penalty do: `presence_penalty` and `frequency_penalty` are parameters used to control the diversity and repetition of the output of the language model. Let me explain what they do in more detail.          
