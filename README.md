@@ -69,9 +69,9 @@ And in practice, the optimal values of these parameters often need to be determi
 
 # Usage:
 2024-09-11  
-Added LongGPT-based nodes that can directly generate cue word projects.
+Added LongGPT-based nodes that can directly generate cue word projects.  
 2024-09-07  
-Added local and API multifunctional visual analytics node for Qwen2VL
+Added local and API multifunctional visual analytics node for Qwen2VL  
 2024-08-21  
 Three new node types based on gemini 1.5 flashAPI have been added, providing text dialog, cue word backpropagation and flux clip_L and clip_T5 cue word output nodes respectively.  
 ![](image/demo12.png) 
