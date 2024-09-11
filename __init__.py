@@ -55,6 +55,10 @@ from .nodes.Qwen2VLCaption import NODE_DISPLAY_NAME_MAPPINGS as QWEN2VL_CAPTION_
 from .nodes.Qwen2VLLocalCaption import NODE_CLASS_MAPPINGS as QWEN2VL_LOCAL_CAPTION_CLASS_MAPPINGS
 from .nodes.Qwen2VLLocalCaption import NODE_DISPLAY_NAME_MAPPINGS as QWEN2VL_LOCAL_CAPTION_DISPLAY_MAPPINGS
 
+# 导入新的 PromptEngineeringNode 节点
+from .nodes.PromptEngineeringNode import NODE_CLASS_MAPPINGS as PROMPT_ENGINEERING_NODE_CLASS_MAPPINGS
+from .nodes.PromptEngineeringNode import NODE_DISPLAY_NAME_MAPPINGS as PROMPT_ENGINEERING_NODE_DISPLAY_MAPPINGS
+
 # 调用初始化函数
 initialize_github_links()
 
@@ -92,8 +96,12 @@ NODE_CLASS_MAPPINGS = {
     **PALI_GEMMA_3B_CAPTIONER_CLASS_MAPPINGS,   # 添加 PaliGemma3bCaptioner 节点
     **QWEN2VL_CAPTION_CLASS_MAPPINGS,   # 添加 Qwen2VLCaption 节点
     **QWEN2VL_LOCAL_CAPTION_CLASS_MAPPINGS,  # 添加 Qwen2VLLocalCaption 节点
-    
+    **PROMPT_ENGINEERING_NODE_CLASS_MAPPINGS,  # 添加 PromptEngineeringNode 节点
 }
+
+from .nodes.PromptEngineeringNode import NODE_CLASS_MAPPINGS as PROMPT_ENGINEERING_NODE
+
+NODE_CLASS_MAPPINGS.update(PROMPT_ENGINEERING_NODE)
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     **GROQ_DISPLAY_MAPPINGS, 
@@ -117,6 +125,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **PALI_GEMMA_3B_CAPTIONER_DISPLAY_MAPPINGS,  # 添加 PaliGemma3bCaptioner 节点
     **QWEN2VL_CAPTION_DISPLAY_MAPPINGS,  # 添加 Qwen2VLCaption 节点
     **QWEN2VL_LOCAL_CAPTION_DISPLAY_MAPPINGS,  # 添加 Qwen2VLLocalCaption 节点
+    **PROMPT_ENGINEERING_NODE_DISPLAY_MAPPINGS,  # 添加 PromptEngineeringNode 节点
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "load_api_key"]
