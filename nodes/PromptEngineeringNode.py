@@ -4,6 +4,7 @@ import os
 import asyncio
 import aiohttp
 import logging
+import re
 from typing import Tuple, Dict, Any
 
 class PromptEngineeringNode:
@@ -30,26 +31,26 @@ class PromptEngineeringNode:
                 "output_format": (["纯文本", "Markdown", "HTML", "JSON"], {"default": "Markdown"}),
             },
             "optional": {
-                "is_local": ("BOOLEAN", {"default": True}),
+                "is_local": ("BOOLEAN", {"default": False}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 1.0, "step": 0.1}),
                 "max_tokens": ("INT", {"default": 2000, "min": 100, "max": 4096}),
             }
         }
 
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("response", "history", "prompt")
     FUNCTION = "generate_prompt_sync"
     CATEGORY = "🌙DW/提示词工程"
 
     def generate_prompt_sync(self, input_text: str, prompt_type: str, model_name: str, base_url: str, api_key: str, 
                              language: str, output_format: str, is_local: bool = True, temperature: float = 0.7, 
-                             max_tokens: int = 2000) -> Tuple[str]:
-        # 使用asyncio.run来运行异步方法
+                             max_tokens: int = 2000) -> Tuple[str, str, str]:
         return asyncio.run(self.generate_prompt(input_text, prompt_type, model_name, base_url, api_key, 
                                                 language, output_format, is_local, temperature, max_tokens))
 
     async def generate_prompt(self, input_text: str, prompt_type: str, model_name: str, base_url: str, api_key: str, 
                               language: str, output_format: str, is_local: bool = True, temperature: float = 0.7, 
-                              max_tokens: int = 2000) -> Tuple[str]:
+                              max_tokens: int = 2000) -> Tuple[str, str, str]:
         self.model_name = model_name
         self.base_url = base_url
         self.api_key = api_key
@@ -60,15 +61,67 @@ class PromptEngineeringNode:
 
         try:
             if self.is_local:
-                response = await self.local_inference(system_prompt, user_prompt, temperature, max_tokens)
+                structured_prompt = await self.local_inference(system_prompt, user_prompt, temperature, max_tokens)
             else:
-                response = await self.api_inference(system_prompt, user_prompt, temperature, max_tokens)
+                structured_prompt = await self.api_inference(system_prompt, user_prompt, temperature, max_tokens)
 
-            formatted_response = self.format_output(response, output_format)
-            return (formatted_response,)
+            formatted_structured_prompt = self.format_output(structured_prompt, output_format)
+            
+            # 使用结构化提示词生成最终内容
+            final_content = await self.generate_final_content(formatted_structured_prompt, input_text, temperature, max_tokens)
+            
+            # 将历史记录转换为Markdown格式
+            history = self.format_history_to_markdown(formatted_structured_prompt, input_text, final_content)
+
+            return (formatted_structured_prompt, history, final_content)
         except Exception as e:
             self.logger.error(f"生成提示词失败: {str(e)}", exc_info=True)
-            return (f"错误: 生成提示词失败 - {str(e)}",)
+            return (f"错误: 生成提示词失败 - {str(e)}", "", "")
+        
+    async def generate_final_content(self, structured_prompt: str, user_input: str, temperature: float, max_tokens: int) -> str:
+        if self.is_local:
+            raw_response = await self.local_inference(structured_prompt, user_input, temperature, max_tokens)
+        else:
+            raw_response = await self.api_inference(structured_prompt, user_input, temperature, max_tokens)
+        
+        # 提取 <output></output> 标签内的内容
+        output_content = self.extract_output_content(raw_response)
+        return output_content
+
+    def extract_output_content(self, text: str) -> str:
+        pattern = r'<output>(.*?)</output>'
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            content = match.group(1).strip()
+            # 移除结构标题和标签
+            lines = content.split('\n')
+            cleaned_lines = []
+            for line in lines:
+                line = line.strip()
+                if not line.startswith(('1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '<', '>')):
+                    if ':' in line:
+                        _, text = line.split(':', 1)
+                        cleaned_lines.append(text.strip())
+                    else:
+                        cleaned_lines.append(line)
+            
+            # 合并相邻的短句
+            merged_lines = []
+            current_line = ""
+            for line in cleaned_lines:
+                if len(current_line) + len(line) < 100:  # 可以调整这个数值来控制合并的程度
+                    current_line += " " + line if current_line else line
+                else:
+                    if current_line:
+                        merged_lines.append(current_line)
+                    current_line = line
+            if current_line:
+                merged_lines.append(current_line)
+            
+            return '\n\n'.join(merged_lines)
+        else:
+            self.logger.warning("未找到 <output> 标签，返回空字符串")
+            return ""
 
     def get_system_prompt(self, prompt_type: str, language: str) -> str:
         base_prompt = f"""
@@ -84,7 +137,11 @@ class PromptEngineeringNode:
         8. 个性化 (Personalization): 根据需要调整AI的语气和风格。
         9. 约束条件 (Constraints): 列出任何限制或约束条件。
 
-        请确保生成的提示词结构清晰,内容丰富,能够指导AI生成高质量的内容。使用Markdown格式来组织提示词的结构,并使用XML标签来标记关键部分。
+        对于视觉相关的提示词,请综合描述构图、颜色、风格和光照等元素,不要使用单独的标签,而是将它们整合成连贯的段落。
+
+        请确保生成的提示词结构清晰,内容丰富,能够指导AI生成高质量的内容。
+
+        重要提示：将所有内容都放在 <output></output> 标签内,不要包含任何额外的说明或解释。确保输出的内容是连贯的、优化过的,没有结构标题和标签。
         """
         
         type_specific_prompts = {
@@ -166,6 +223,22 @@ class PromptEngineeringNode:
             except json.JSONDecodeError:
                 self.logger.warning("无法将文本解析为JSON,返回原始文本")
                 return text
+
+    def format_history_to_markdown(self, system_content: str, user_content: str, assistant_content: str) -> str:
+        markdown_history = f"""
+## 系统消息
+
+{system_content}
+
+## 用户输入
+
+{user_content}
+
+## 助手回复
+
+{assistant_content}
+"""
+        return markdown_history.strip()
 
 NODE_CLASS_MAPPINGS = {
     "PromptEngineeringNode": PromptEngineeringNode
