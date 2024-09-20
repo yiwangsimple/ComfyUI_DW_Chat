@@ -21,7 +21,6 @@ class FluxPromptEngineeringNode:
             "required": {
                 "input_prompt": ("STRING", {"multiline": True}),
                 "max_length": ("INT", {"default": 256, "min": 1, "max": 1024}),
-                "device": (["cuda", "cpu"], {"default": "cuda"}),
             }
         }
 
@@ -29,9 +28,8 @@ class FluxPromptEngineeringNode:
     FUNCTION = "enhance_prompt"
     CATEGORY = "🌙DW/提示词工程"
 
-    def enhance_prompt(self, input_prompt: str, max_length: int = 256, device: str = "cuda") -> Tuple[str]:
-        if self.enhancer is None or self.device != device:
-            self.device = device
+    def enhance_prompt(self, input_prompt: str, max_length: int = 256) -> Tuple[str]:
+        if self.enhancer is None:
             self.load_model()
 
         enhanced_input = f"enhance prompt: {input_prompt}"
@@ -50,16 +48,11 @@ class FluxPromptEngineeringNode:
         try:
             print(f"Loading model from {self.model_path}")
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
-            self.model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.model_path,
-                device_map=self.device,
-                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
-            )
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_path)
             self.enhancer = pipeline('text2text-generation',
                                      model=self.model,
                                      tokenizer=self.tokenizer,
-                                     repetition_penalty=1.2,
-                                     device=self.device)
+                                     repetition_penalty=1.2)
             print("Model loaded successfully")
         except Exception as e:
             print(f"Error loading model: {e}")
@@ -85,7 +78,7 @@ class FluxPromptEngineeringNode:
         self.model = None
         self.tokenizer = None
         self.enhancer = None
-        torch.cuda.empty_cache() if self.device == "cuda" else None
+        torch.cuda.empty_cache()
         gc.collect()
 
 NODE_CLASS_MAPPINGS = {
