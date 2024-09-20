@@ -68,6 +68,8 @@ And in practice, the optimal values of these parameters often need to be determi
 </details> 
 
 # Usage:
+2024-09-20  
+A new Flux Prompt-Enhance extension node has been added, when using this node make sure to download and place the Flux-Prompt-Enhance model in the prompt_generator/Flux-Prompt-Enhance folder in the model directory of ComfyUI.  
 2024-09-11  
 Added LongGPT-based nodes that can directly generate cue word projects.  
 2024-09-07  
