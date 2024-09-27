@@ -9,4 +9,4 @@ langdetect
 tenacity
 dashscope
 qwen-vl-utils
-git+https://github.com/huggingface/transformers
+
