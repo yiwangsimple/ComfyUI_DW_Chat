@@ -42,10 +42,9 @@ class OllamaImageToText:
                 }),
                 "model": (s.available_models,) if s.available_models else (["No models found"],),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),  # 添加 top_k 参数
-                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),  # 添加 max_tokens 参数
+                "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),
+                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),
                 "keep_alive": ("BOOLEAN", {"default": False}),
-                
             },
         }
 
@@ -68,11 +67,14 @@ class OllamaImageToText:
         client = Client(host=self.base_url)
         options = {
             "seed": seed,
-            "top_k": top_k,  # 添加 top_k 参数
-            "max_tokens": max_tokens,  # 添加 max_tokens 参数
+            "top_k": top_k,
+            "max_tokens": max_tokens,
         }
 
-        response = client.generate(model=model, prompt=query, keep_alive=keep_alive, options=options, images=images_b64)
+        # 将布尔值转换为字符串
+        keep_alive_str = "5m" if keep_alive else "0"
+
+        response = client.generate(model=model, prompt=query, keep_alive=keep_alive_str, options=options, images=images_b64)
 
         return (response['response'],)
 
@@ -108,9 +110,9 @@ class OllamaTextToText:
                 "top_k": ("FLOAT", {"default": 40, "min": 0, "max": 100, "step": 1}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0, "max": 1, "step": 0.05}),
                 "temperature": ("FLOAT", {"default": 0.5, "min": 0, "max": 1, "step": 0.05}),
-                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),  # 添加 max_tokens 参数
+                "max_tokens": ("INT", {"default": 100, "min": 1, "max": 1024}),
                 "tfs_z": ("FLOAT", {"default": 1, "min": 1, "max": 1000, "step": 0.05}),
-                "keep_alive": (["0", "60m"],),
+                "keep_alive": (["0", "5m", "10m", "15m", "30m", "60m"],), 
             },"optional": {
                 "context": ("STRING", {"forceInput": True}),
             }
@@ -121,24 +123,23 @@ class OllamaTextToText:
     FUNCTION = "ollama_text_to_text"
     CATEGORY = "🌙DW/Chat"
 
-    def ollama_text_to_text(self, prompt, model, extra_model, system, seed, top_k, top_p,temperature,max_tokens,tfs_z, keep_alive, context=None):
-
+    def ollama_text_to_text(self, prompt, model, extra_model, system, seed, top_k, top_p, temperature, max_tokens, tfs_z, keep_alive, context=None):
         client = Client(host=self.base_url)
 
         options = {
             "seed": seed,
-            "top_k":top_k,
-            "top_p":top_p,
-            "temperature":temperature,
-            "max_tokens":max_tokens,  # 添加 max_tokens 参数
-            "tfs_z":tfs_z,
+            "top_k": top_k,
+            "top_p": top_p,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "tfs_z": tfs_z,
         }
             
         if extra_model != "none":
             model = extra_model
         response = client.generate(model=model, system=system, prompt=prompt, keep_alive=keep_alive, context=context, options=options)
 
-        return (response['response'],response['context'],)
+        return (response['response'], response['context'],)
 
 # 初始化模型列表
 OllamaImageToText.initialize()
