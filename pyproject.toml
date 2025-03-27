@@ -1,0 +1,15 @@
+[project]
+name = "comfyui_groqchat"
+description = "Content generation with open source models in comfyui via graq api implementation."
+version = "1.0.0"
+license = "LICENSE"
+dependencies = ["groq"]
+
+[project.urls]
+Repository = "https://github.com/yiwangsimple/ComfyUI_GroqChat"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI_GroqChat"
+Icon = ""
