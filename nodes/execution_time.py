@@ -41,7 +41,7 @@ origin_execute = execution.execute
 def timed_execute(*args, **kwargs):
     return origin_execute(*args, **kwargs)
 
-def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage):
+def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage, *args):
     unique_id = current_item
 
     # 尝试访问 class_type（需要根据实际情况调整）
@@ -54,7 +54,7 @@ def swizzle_origin_execute(server, prompt, outputs, current_item, extra_data, ex
 
     last_node_id = server.last_node_id
     
-    result, execution_time = timed_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage)
+    result, execution_time = timed_execute(server, prompt, outputs, current_item, extra_data, executed, prompt_id, outputs_ui, object_storage, *args)
     
     if server.client_id is not None and last_node_id != server.last_node_id:
         server.send_sync(
